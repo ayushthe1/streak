@@ -1,4 +1,4 @@
-package controller
+package handler
 
 import (
 	"log"
@@ -9,13 +9,12 @@ import (
 	"github.com/ayushthe1/streak/database"
 	"github.com/ayushthe1/streak/models"
 	util "github.com/ayushthe1/streak/utils"
-	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
 
-var validate = validator.New()
+// var validate = validator.New()
 
-func Signup(c *fiber.Ctx) error {
+func SignupHandler(c *fiber.Ctx) error {
 
 	var data models.User
 	var userData models.User
@@ -86,7 +85,7 @@ func Signup(c *fiber.Ctx) error {
 
 }
 
-func Login(c *fiber.Ctx) error {
+func LoginHandler(c *fiber.Ctx) error {
 	var data models.User
 
 	if err := c.BodyParser(&data); err != nil {
@@ -133,7 +132,7 @@ func Login(c *fiber.Ctx) error {
 
 }
 
-func Logout(c *fiber.Ctx) error {
+func LogoutHandler(c *fiber.Ctx) error {
 	c.ClearCookie("jwt")
 	log.Println("logged out")
 	c.Status(200)

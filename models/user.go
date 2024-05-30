@@ -13,6 +13,7 @@ type User struct {
 	LastName       string `json:"last_name" validate:"required,min=2,max=100"`
 	Email          string `json:"email" validate:"email,required"`
 	Password       string `json:"password" validate:"required,min=2"`
+	LastActivity   int64  `json:"last_activity"`
 	HashedPassword []byte
 }
 

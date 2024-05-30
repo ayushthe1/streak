@@ -2,31 +2,33 @@ package main
 
 import (
 	"log"
-	"os"
+	"sync"
 
 	"github.com/ayushthe1/streak/database"
-	"github.com/ayushthe1/streak/routes"
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors"
-	"github.com/joho/godotenv"
+	"github.com/ayushthe1/streak/httpserver"
+	"github.com/ayushthe1/streak/ws"
 )
 
 func main() {
 	database.Connect()
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env files")
-	}
-	port := os.Getenv("PORT")
-	app := fiber.New()
 
-	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "https://gopherblog.ayushsharma.co.in, https://api.ayushsharma.co.in, http://localhost:4000 ",
-		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
-		AllowCredentials: true,
-	}))
+	var wg sync.WaitGroup
+	wg.Add(2)
 
-	routes.Setup(app)
-	log.Println("Server listening on port", port)
-	app.Listen(":" + port)
+	go func() {
+		// Decrement the counter when this goroutine completes
+		defer wg.Done()
+		ws.StartWebSocketServer()
+	}()
+
+	go func() {
+		// Decrement the counter when this goroutine completes
+		defer wg.Done()
+		httpserver.StartHttpServer()
+	}()
+
+	// Wait for both goroutines to complete
+	wg.Wait()
+
+	log.Println("Both servers have been started and are running concurrently.")
 }

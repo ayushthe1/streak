@@ -1,11 +1,8 @@
 package database
 
 import (
-	"context"
-	"fmt"
 	"log"
 	"os"
-	"time"
 
 	"github.com/ayushthe1/streak/models"
 	"github.com/joho/godotenv"
@@ -40,23 +37,23 @@ func Connect() {
 		&models.ContactList{},
 	)
 
-	redisAddress := os.Getenv("REDIS_ADDRESS")
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     redisAddress,
-		Password: "", // no password set
-		DB:       0,  // use default DB
-	})
+	// redisAddress := os.Getenv("REDIS_ADDRESS")
+	// rdb := redis.NewClient(&redis.Options{
+	// 	Addr:     redisAddress,
+	// 	Password: "", // no password set
+	// 	DB:       0,  // use default DB
+	// })
 
-	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
-	defer cancel()
+	// ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	// defer cancel()
 
-	_, err = rdb.Ping(ctx).Result()
-	if err != nil {
-		fmt.Println("Error connecting to Redis:", err)
-		return
-	}
-	log.Println("***********************CONNECTED TO REDIS********************* ")
+	// _, err = rdb.Ping(ctx).Result()
+	// if err != nil {
+	// 	fmt.Println("Error connecting to Redis:", err)
+	// 	return
+	// }
+	// log.Println("***********************CONNECTED TO REDIS********************* ")
 
-	RedisClient = rdb
+	// RedisClient = rdb
 
 }
