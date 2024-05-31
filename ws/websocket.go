@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"sync"
 	"time"
 
 	"github.com/ayushthe1/streak/handler"
-	"github.com/ayushthe1/streak/middleware"
 	"github.com/ayushthe1/streak/models"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -31,6 +31,17 @@ var clients = make(map[*Client]bool)
 // A channel to broadcast chat messages to all connected clients.
 var broadcast = make(chan *models.Chat)
 
+var presence PresenceService
+
+func init() {
+	onlineUsers := map[string]bool{}
+	mu := &sync.Mutex{}
+	presence = PresenceService{
+		onlineUsers: onlineUsers,
+		mu:          mu,
+	}
+}
+
 // Handles incoming WebSocket requests.
 func ServeWS(c *fiber.Ctx) error {
 	log.Println("Inside ServeWS")
@@ -48,6 +59,7 @@ func ServeWS(c *fiber.Ctx) error {
 			defer func() {
 				log.Printf("exiting: %s", conn.RemoteAddr().String())
 				delete(clients, client)
+				presence.setUserOffline(client.Username)
 				conn.Close()
 			}()
 
@@ -84,8 +96,10 @@ func receiver(client *Client) {
 		if m.Type == "bootup" {
 			// do mapping on bootup
 			client.Username = m.User
+			presence.setUserOnline(client.Username)
 			fmt.Println("client successfully mapped", &client, client, client.Username)
 		} else {
+			log.Println("m.User = ", m.User)
 			fmt.Println("received message", m.Type, m.Chat)
 			c := m.Chat //Copies the Chat field from the message to a local variable c.
 			c.Timestamp = time.Now().Unix()
@@ -98,9 +112,18 @@ func receiver(client *Client) {
 			}
 
 			// is this really needed ?
-			c.ID = id
+			log.Print("This is ID of C after chat is created", c.Id)
+			log.Println("This is the id value returned :", id)
+			// c.ID = id
 
-			broadcast <- &c // Sends the chat message to the broadcast channel for broadcasting to other connected clients.
+			recieverUsername := c.To
+
+			if presence.isUserOnline((recieverUsername)) {
+				broadcast <- &c // Sends the chat message to the broadcast channel for broadcasting to other client (set in chat.To field only when he is online).
+			} else {
+				log.Printf("User %s is not online currently. Can't send message", recieverUsername)
+			}
+
 		}
 	}
 }
@@ -133,7 +156,7 @@ func broadcaster() {
 }
 
 func Setup(app *fiber.App) {
-	app.Use(middleware.IsAuthenticate)
+	// app.Use(middleware.IsAuthenticate)
 	app.Get("/ws", ServeWS)
 }
 

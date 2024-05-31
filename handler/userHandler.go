@@ -9,10 +9,11 @@ import (
 	"github.com/ayushthe1/streak/database"
 	"github.com/ayushthe1/streak/models"
 	util "github.com/ayushthe1/streak/utils"
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
 
-// var validate = validator.New()
+var validate = validator.New()
 
 func SignupHandler(c *fiber.Ctx) error {
 
@@ -58,9 +59,9 @@ func SignupHandler(c *fiber.Ctx) error {
 	}
 
 	user.SetPassword(data.Password)
-	err := database.DB.Create(&user)
-	if err != nil {
-		log.Println(err)
+	result := database.DB.Create(&user)
+	if result.Error != nil {
+		log.Println(result.Error)
 		return c.JSON(fiber.Map{
 			"message": "Error creating user",
 		})

@@ -1,7 +1,7 @@
 package models
 
 type Chat struct {
-	ID        string `json:"id"`
+	Id        uint   `json:"id"`
 	From      string `json:"from"`
 	To        string `json:"to"`
 	Msg       string `json:"message"`

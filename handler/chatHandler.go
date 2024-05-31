@@ -121,11 +121,12 @@ func GetUserByUsername(username string) (*models.User, error) {
 }
 
 // Get all the chat history between 2 users. Exepects the usernames provided to already be verified
-func GetAllChats(username1 string, username2 string) ([]models.Chat, error) {
+func GetAllChats(u1 string, u2 string) ([]models.Chat, error) {
 
 	var allChats []models.Chat
 
-	result := database.DB.Where("username=?", username1).Or("username=?", username2).Find(&allChats)
+	// result := database.DB.Where("from=?", username1).Or("username=?", username2).Find(&allChats)
+	result := database.DB.Where(`("from" = ? AND "to" = ?) OR ("from" = ? AND "to" = ?)`, u1, u2, u2, u1).Find(&allChats)
 
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
@@ -151,12 +152,12 @@ func GetContacts() ([]models.User, error) {
 
 }
 
-func CreateChat(chatMsg *models.Chat) (string, error) {
+func CreateChat(chatMsg *models.Chat) (interface{}, error) {
 
 	result := database.DB.Create(chatMsg)
 	if result.Error != nil {
 		return "", result.Error
 	}
 
-	return chatMsg.ID, nil
+	return chatMsg.Id, nil
 }
