@@ -42,15 +42,6 @@ func SignupHandler(c *fiber.Ctx) error {
 
 	}
 
-	database.DB.Where("username=?", strings.TrimSpace(data.Username)).First(&userData)
-	if userData.Id != 0 {
-		c.Status(400)
-		return c.JSON(fiber.Map{
-			"message": "Username already exist",
-		})
-
-	}
-
 	user := models.User{
 		FirstName: data.FirstName,
 		Username:  data.Username,
