@@ -9,8 +9,10 @@ import (
 	"time"
 
 	"github.com/ayushthe1/streak/handler"
+	"github.com/ayushthe1/streak/kafka"
 	"github.com/ayushthe1/streak/models"
 	"github.com/ayushthe1/streak/msgqueue"
+	util "github.com/ayushthe1/streak/utils"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/websocket/v2"
@@ -42,6 +44,8 @@ var clients = struct {
 
 // A channel to broadcast chat messages to all connected clients.
 var broadcast = make(chan *models.Chat)
+
+var BroadcastKafkaEvent = util.BroadcastKafkaEvent
 
 var presence PresenceService
 
@@ -138,6 +142,18 @@ func receiveMessages(ctx context.Context, client *Client) {
 			presence.setUserOnline(client.Username)
 			fmt.Println("client successfully mapped", &client, client, client.Username)
 
+			// Produce welcome message to Kafka
+			log.Println("Producing welcome msg to kafka")
+			welcomeMsg := models.Notification{
+				Type:     "welcome",
+				Username: client.Username,
+				Message:  "Welcome to the chat!",
+			}
+
+			if err := kafka.ProduceNotification("notification_topic", welcomeMsg); err != nil {
+				log.Printf("Failed to produce welcome message: %s", err)
+			}
+
 			// deliver messages to user already stored in queue
 			log.Println("Calling ConsumeMessags function by :", client.Username)
 
@@ -159,23 +175,32 @@ func receiveMessages(ctx context.Context, client *Client) {
 			c := m.Chat //Copies the Chat field from the message to a local variable c.
 			c.Timestamp = time.Now().Unix()
 
-			// save in db
-			_, err := handler.CreateChat(&c)
-			if err != nil {
-				log.Println("error while saving chat in DB", err)
-				client.cancel() // Cancel the context to stop the goroutine
-				return
-			}
-
-			// // is this really needed ?
-			// log.Print("This is ID of C after chat is created", c.Id)
-			// log.Println("This is the id value returned :", id)
-			// // c.ID = id
+			// save in db (need to check logic here for cancelling context)
+			go func() {
+				_, err := handler.CreateChat(&c)
+				if err != nil {
+					log.Println("error while saving chat in DB", err)
+					log.Fatal("Stopping application due to DB error")
+					client.cancel() // Cancel the context to stop the goroutine
+					return
+				}
+			}()
 
 			recieverUsername := c.To
 
 			if presence.isUserOnline((recieverUsername)) {
 				broadcast <- &c // Sends the chat message to the broadcast channel for broadcasting to other client (set in chat.To field only when he is online).
+
+				// Produce notification message to Kafka
+				notificationMsg := models.Notification{
+					Type:     "message",
+					Username: recieverUsername,
+					Message:  "You have a new message from " + c.From,
+				}
+				if err := kafka.ProduceNotification("notification_topic", notificationMsg); err != nil {
+					log.Printf("Failed to produce notification message: %s", err)
+				}
+
 			} else {
 				log.Printf("User %s is not online currently. Sending message to the queue", recieverUsername)
 
@@ -184,7 +209,7 @@ func receiveMessages(ctx context.Context, client *Client) {
 
 		}
 	}
-	log.Println("At end of receive msg")
+
 }
 
 // function to deliver message to the user when he is online
@@ -205,6 +230,29 @@ func deliverMessageWhenUserIsOnline() {
 
 			if client.Username == message.From || client.Username == message.To {
 				err := client.Conn.WriteJSON(message) // send the msg
+				if err != nil {
+					log.Printf("Websocket error: %s", err)
+					client.Conn.Close()
+					delete(clients.m, client)
+				}
+			}
+		}
+		clients.Unlock()
+	}
+}
+
+func deliverNotificationWhenUserIsOnline() {
+	log.Println("Inside deliver notification")
+
+	for {
+		notification := <-BroadcastKafkaEvent
+		log.Println("new notification to send : ", notification)
+
+		clients.Lock()
+		for client := range clients.m {
+
+			if client.Username == notification.Username {
+				err := client.Conn.WriteJSON(notification) // send the msg
 				if err != nil {
 					log.Printf("Websocket error: %s", err)
 					client.Conn.Close()
@@ -308,6 +356,7 @@ func Setup(app *fiber.App) {
 
 func StartWebSocketServer() {
 	go deliverMessageWhenUserIsOnline()
+	go deliverNotificationWhenUserIsOnline()
 
 	app := fiber.New()
 
