@@ -1,4 +1,4 @@
-version: '3'
+version: '3.9'
 services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.4.0
@@ -32,3 +32,24 @@ services:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
       KAFKA_CLUSTERS_0_ZOOKEEPER: zookeeper:2181
+  
+  db:
+    image:  postgres
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=mysecretpassword
+    ports:
+      - 5432:5432
+
+  # rabbitmq:
+  #   image: rabbitmq:3-management-alpine
+  #   container_name: rabbitmq
+  #   hostname: rabbitmq
+  #   ports:
+  #     - 5672:5672   # for sender and consumer connections
+  #     - 15672:15672 # for serve RabbitMQ GUI
+  #   volumes:
+  #     - ${HOME}/dev-rabbitmq/data/:/var/lib/rabbitmq
+  #     - ${HOME}/dev-rabbitmq/log/:/var/log/rabbitmq
+  #   restart: always
+

@@ -26,7 +26,7 @@ func InitProducer(brokers []string) error {
 }
 
 // function to producer
-func ProduceNotification(topic string, message interface{}) error {
+func ProduceEventToKafka(topic string, message interface{}) error {
 	msgBytes, err := json.Marshal(message)
 	if err != nil {
 		return err
@@ -39,9 +39,10 @@ func ProduceNotification(topic string, message interface{}) error {
 
 	_, _, err = producer.SendMessage(msg)
 	if err != nil {
+		log.Println("err 87")
 		return err
 	}
-	log.Printf("Notification %v produced to kafka in ProduceNotification", msg)
+	log.Printf("Event %v produced to topic %s in ProduceNotification", msg, topic)
 
 	return nil
 }

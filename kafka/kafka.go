@@ -18,13 +18,14 @@ func StartKafkaConsumer() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	go ConsumeNotifications(ctx, brokers, "notification_group", []string{"notification_topic"})
+	go ConsumeMessages(ctx, brokers, "user_event_group", []string{NotificationTopic, ActivityTopic})
 
 	stop := make(chan os.Signal, 1)
 	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
 	<-stop // Wait for a signal
 
 	log.Println("Shutting down gracefully...")
+	os.Exit(0)
 	// cancel() called
 
 }
