@@ -7,3 +7,8 @@ type ActivityEvent struct {
 	Timestamp int64  `json:"timestamp"`
 	Details   string `json:"details"`
 }
+
+type ChatEvent struct {
+	Type    string `json:"type"`
+	ChatMsg *Chat  `json:"chat"`
+}

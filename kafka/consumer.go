@@ -7,14 +7,17 @@ import (
 
 	"github.com/IBM/sarama"
 	"github.com/ayushthe1/streak/channels"
+	"github.com/ayushthe1/streak/handler"
 	"github.com/ayushthe1/streak/models"
 )
 
-var NotificationMsgType = "notification"
-var ActivityMsgType = "activity"
+var NotificationMsgType = "notification" // sent only to a specific user
+var ActivityMsgType = "activity"         // sent to all users
+var ChatMsgType = "chat"                 // chat is inserted in DB
 
-var NotificationTopic = "notification_topic"
-var ActivityTopic = "activity_topic"
+var NotificationTopic = "notification_topic" // all notification events(event meant for any specific user) published to this topic
+var ActivityTopic = "activity_topic"         // all activity events(events that will be sent to all use3rs) published to this topic
+var ChatTopic = "chat_topic"                 // all chat messages will be published to this topic
 
 type consumer struct{}
 
@@ -72,10 +75,27 @@ func (consumer) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.Cons
 			var activity models.ActivityEvent
 			err := json.Unmarshal(message.Value, &activity)
 			if err != nil {
-				log.Printf("Error unmarshalling activity: %v", err)
+				log.Printf("Error unmarshalling activity: %v", err) // Unmarshal(nil *models.Chat)
 				continue
 			}
 			channels.BroadcastKafkaActivity <- &activity
+			sess.MarkMessage(message, "")
+
+		case ChatMsgType: //TODO: maybe use channel later to avoid blocking ?
+			var chatevent models.ChatEvent
+			err := json.Unmarshal(message.Value, &chatevent)
+			log.Println("Chat msg received in consumer is : ", chatevent)
+			if err != nil {
+				log.Printf("error unmarsahlling the chat msg in kafka %v ", err)
+				continue
+			}
+
+			// save the chat in DB
+			chat := chatevent.ChatMsg
+			_, err = handler.CreateChat(chat)
+			if err != nil {
+				log.Fatalf("unabe to save chat msg in db : %s", err.Error())
+			}
 			sess.MarkMessage(message, "")
 
 		default:

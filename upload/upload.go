@@ -52,7 +52,7 @@ func ConnectoRabbitMQ() {
 
 	RabbitChannel = channel
 
-	log.Println("Connected to RabbitMQ")
+	log.Println("Connected to RabbitMQ in Upload File")
 
 }
 

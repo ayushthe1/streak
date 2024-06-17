@@ -42,7 +42,7 @@ func ProduceEventToKafka(topic string, message interface{}) error {
 		log.Println("err 87")
 		return err
 	}
-	log.Printf("Event %v produced to topic %s in ProduceNotification", msg, topic)
+	log.Printf("Event produced to %s in ProduceNotification", topic)
 
 	return nil
 }

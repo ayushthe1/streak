@@ -10,6 +10,7 @@ services:
 
   kafka:
     image: confluentinc/cp-kafka:7.4.0
+    restart: always
     depends_on:
       - zookeeper
     ports:
@@ -41,6 +42,11 @@ services:
     ports:
       - 5432:5432
 
+  redis-db:
+    image:  redis
+    restart: always
+    ports:
+      - 6379:6379
   # rabbitmq:
   #   image: rabbitmq:3-management-alpine
   #   container_name: rabbitmq

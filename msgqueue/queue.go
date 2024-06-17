@@ -10,7 +10,9 @@ import (
 
 // function to publish message to RabbitMQ. The queueName should be the username of the user
 func Publish(queueName string, chat *models.Chat) error {
-	ConnectoRabbitMQ()
+	// ConnectoRabbitMQ()
+	connLock.Lock()
+	defer connLock.Unlock()
 
 	_, err := RabbitChannel.QueueDeclare(
 		queueName, // name of the queue
@@ -55,6 +57,12 @@ func Publish(queueName string, chat *models.Chat) error {
 
 func Consume(queueName string) (<-chan amqp.Delivery, error) {
 
+	connLock.Lock()
+	defer connLock.Unlock()
+
+	// log.Println("Inside Consume func : Is the channel closed ?", RabbitChannel.IsClosed())
+	// log.Println("Inside Consume func : Is the conn closed ?", RabbitConn.IsClosed())
+
 	log.Printf("Inside Consume func, going to consume now for user %s ", queueName)
 	_, err := RabbitChannel.QueueDeclare(
 		queueName, // name of the queue
@@ -73,7 +81,7 @@ func Consume(queueName string) (<-chan amqp.Delivery, error) {
 	return RabbitChannel.Consume(
 		queueName,
 		"",
-		true, // auto-ack
+		false, // auto-ack -  Setting this to false means the consumer must explicitly acknowledge each message after processing it.
 		false,
 		false,
 		false,

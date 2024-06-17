@@ -158,6 +158,7 @@ func CreateChat(chatMsg *models.Chat) (interface{}, error) {
 	if result.Error != nil {
 		return "", result.Error
 	}
+	log.Printf("message : %s saved in DB : ", chatMsg.Msg)
 
 	return chatMsg.Id, nil
 }
