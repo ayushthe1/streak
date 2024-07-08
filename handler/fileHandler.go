@@ -1,13 +1,14 @@
 package handler
 
 import (
-	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
 
-	"github.com/ayushthe1/streak/channels"
 	"github.com/ayushthe1/streak/models"
 	"github.com/ayushthe1/streak/upload"
+
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -25,9 +26,18 @@ func FileUploadHandler(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).SendString("Failed to get file")
 	}
 
-	tempFilePath := fmt.Sprintf("/tmp/streak/%s", file.Filename)
+	// Create a temporary file within our temp-images directory
+	tempDir := "/tmp/streakfile" // replace with actual path
+	if err := os.MkdirAll(tempDir, os.ModePerm); err != nil {
+		return c.Status(fiber.StatusInternalServerError).SendString("Failed to create temp directory")
+	}
+
+	tempFilePath := filepath.Join(tempDir, file.Filename)
+	log.Printf("The temp file path is %s", tempFilePath)
+
+	// Save the file to the temporary path
 	if err := c.SaveFile(file, tempFilePath); err != nil {
-		return c.Status(fiber.StatusInternalServerError).SendString(err.Error())
+		return c.Status(fiber.StatusInternalServerError).SendString("Failed to save file")
 	}
 
 	fileMsg := models.File{
@@ -36,26 +46,20 @@ func FileUploadHandler(c *fiber.Ctx) error {
 		To:           receiverUsername,
 	}
 
-	//TODO: send some context here
-	err = upload.FileUploadProducer(&fileMsg)
-
+	// //TODO: send some context here
+	s3FileUrl, err := upload.FileUploadProducer(&fileMsg)
 	if err != nil {
 		c.Status(http.StatusInternalServerError)
 		return c.JSON(fiber.Map{
-			"unable to upload file to rabbitMQ": err.Error(),
+			"message": "failed to upload the file to s3",
+			"error":   err.Error(),
 		})
 	}
-
-	log.Println("Waiting for s3_URL on channel in FileUploadHandler")
-	s3_URL := <-channels.Broadcast_S3_FileURL
-	log.Println("S3_URL received on channel in FileUploadHandler :", s3_URL)
-
-	fileMsg.S3_File_URL = s3_URL
 
 	c.Status(200)
 	return c.JSON(fiber.Map{
 		"message": "file uploaded to S3",
-		"fileMsg": fileMsg,
+		"fileUrl": s3FileUrl,
 	})
 
 }

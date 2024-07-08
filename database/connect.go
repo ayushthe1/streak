@@ -36,6 +36,7 @@ func Connect() {
 		&models.User{},
 		&models.Chat{},
 		&models.ContactList{},
+		&models.ActivityEvent{},
 	)
 
 	msgqueue.ConnectoRabbitMQ()

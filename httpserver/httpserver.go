@@ -19,7 +19,8 @@ func setupRoutes(app *fiber.App) {
 	protected := app.Group("/api", middleware.IsAuthenticate)
 	protected.Get("/chat-history", handler.ChatHistoryHandler)
 	protected.Get("/contact-list", handler.ContactHandler)
-	protected.Post("file-upload", handler.FileUploadHandler)
+	protected.Get("/activities", handler.ActivityHandler)
+	protected.Post("upload", handler.FileUploadHandler)
 
 }
 

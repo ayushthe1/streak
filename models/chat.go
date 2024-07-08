@@ -5,6 +5,10 @@ type Chat struct {
 	From      string `json:"from"`
 	To        string `json:"to"`
 	Msg       string `json:"message"`
+	FileURL   string `json:"file_url,omitempty"`
+	FileName  string `json:"file_name,omitempty"`
+	FileSize  int64  `json:"file_size,omitempty"`
+	FileType  string `json:"file_type,omitempty"`
 	Timestamp int64  `json:"timestamp,omitempty"`
 }
 

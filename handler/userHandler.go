@@ -33,7 +33,7 @@ func SignupHandler(c *fiber.Ctx) error {
 	}
 
 	//Check if email already exist in database
-	database.DB.Where("email=?", strings.TrimSpace(data.Email)).First(&userData)
+	database.DB.Where("username=?", strings.TrimSpace(data.Username)).First(&userData)
 	if userData.Id != 0 {
 		c.Status(400)
 		return c.JSON(fiber.Map{
@@ -43,10 +43,10 @@ func SignupHandler(c *fiber.Ctx) error {
 	}
 
 	user := models.User{
-		FirstName: data.FirstName,
-		Username:  data.Username,
-		LastName:  data.LastName,
-		Email:     strings.TrimSpace(data.Email),
+		// FirstName: data.FirstName,
+		Username: data.Username,
+		// LastName:  data.LastName,
+		// Email:     strings.TrimSpace(data.Email),
 	}
 
 	user.SetPassword(data.Password)
@@ -87,11 +87,11 @@ func LoginHandler(c *fiber.Ctx) error {
 	}
 
 	var user models.User
-	database.DB.Where("email=?", data.Email).First(&user)
+	database.DB.Where("username=?", data.Username).First(&user)
 	if user.Id == 0 {
 		c.Status(404)
 		return c.JSON(fiber.Map{
-			"message": "Email Address doesn't exit, kindly create an account",
+			"message": " username doesn't exit, kindly create an account",
 		})
 	}
 	if err := user.ComparePassword(data.Password); err != nil {

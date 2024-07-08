@@ -1,6 +1,7 @@
 package models
 
 type ActivityEvent struct {
+	Id        uint   `json:"id"`
 	Type      string `json:"type"`
 	Username  string `json:"username"`
 	Action    string `json:"action"`

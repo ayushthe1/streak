@@ -74,7 +74,7 @@ func ChatHistoryHandler(c *fiber.Ctx) error {
 		})
 	}
 
-	c.Status(http.StatusFound)
+	c.Status(http.StatusOK)
 	return c.JSON(fiber.Map{
 		"message": "Chat history found",
 		"chats":   allChats,
@@ -103,6 +103,34 @@ func ContactHandler(c *fiber.Ctx) error {
 		"data":   allUsers,
 		"Total":  len(allUsers),
 	})
+}
+
+// Return the last 10 aactivities
+func ActivityHandler(c *fiber.Ctx) error {
+	activities, err := GetActivities()
+	if err != nil {
+		c.Status(http.StatusInternalServerError)
+		return c.JSON(fiber.Map{
+			"error": "Couldn't get the activities",
+		})
+	}
+
+	c.Status(200)
+	return c.JSON(fiber.Map{
+		"activities": activities,
+	})
+}
+
+// function to get the latest 10 actiities
+func GetActivities() (activities []models.ActivityEvent, err error) {
+
+	var results []models.ActivityEvent
+	err = database.DB.Order("timestamp desc").Limit(10).Find(&results).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }
 
 func GetUserByUsername(username string) (*models.User, error) {
@@ -152,13 +180,13 @@ func GetContacts() ([]models.User, error) {
 
 }
 
-func CreateChat(chatMsg *models.Chat) (interface{}, error) {
+// func CreateChat(chatMsg *models.Chat) (interface{}, error) {
 
-	result := database.DB.Create(chatMsg)
-	if result.Error != nil {
-		return "", result.Error
-	}
-	log.Printf("message : %s saved in DB : ", chatMsg.Msg)
+// 	result := database.DB.Create(chatMsg)
+// 	if result.Error != nil {
+// 		return "", result.Error
+// 	}
+// 	log.Printf("message : %s saved in DB : ", chatMsg.Msg)
 
-	return chatMsg.Id, nil
-}
+// 	return chatMsg.Id, nil
+// }

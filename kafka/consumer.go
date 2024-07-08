@@ -6,18 +6,24 @@ import (
 	"log"
 
 	"github.com/IBM/sarama"
+	s3 "github.com/ayushthe1/streak/S3"
 	"github.com/ayushthe1/streak/channels"
-	"github.com/ayushthe1/streak/handler"
+	"github.com/ayushthe1/streak/database"
+
+	// "github.com/ayushthe1/streak/handler"
+
 	"github.com/ayushthe1/streak/models"
 )
 
 var NotificationMsgType = "notification" // sent only to a specific user
 var ActivityMsgType = "activity"         // sent to all users
 var ChatMsgType = "chat"                 // chat is inserted in DB
+var FileMsgType = "file"                 // file is saved to S3 bucket
 
 var NotificationTopic = "notification_topic" // all notification events(event meant for any specific user) published to this topic
 var ActivityTopic = "activity_topic"         // all activity events(events that will be sent to all use3rs) published to this topic
 var ChatTopic = "chat_topic"                 // all chat messages will be published to this topic
+var FileTopic = "file_topic"                 // all file messages will be published to this topic
 
 type consumer struct{}
 
@@ -78,7 +84,14 @@ func (consumer) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.Cons
 				log.Printf("Error unmarshalling activity: %v", err) // Unmarshal(nil *models.Chat)
 				continue
 			}
+			activityCopy := activity
 			channels.BroadcastKafkaActivity <- &activity
+
+			// save the activity in DB
+			_, err = CreateActivity(&activityCopy)
+			if err != nil {
+				log.Fatalf("unabe to save activity msg in db : %s", err.Error())
+			}
 			sess.MarkMessage(message, "")
 
 		case ChatMsgType: //TODO: maybe use channel later to avoid blocking ?
@@ -92,10 +105,30 @@ func (consumer) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.Cons
 
 			// save the chat in DB
 			chat := chatevent.ChatMsg
-			_, err = handler.CreateChat(chat)
+			_, err = CreateChat(chat)
+
 			if err != nil {
 				log.Fatalf("unabe to save chat msg in db : %s", err.Error())
 			}
+			sess.MarkMessage(message, "")
+		case FileMsgType:
+			var fileEvent models.File
+			err := json.Unmarshal(message.Value, &fileEvent)
+			if err != nil {
+				log.Printf("error unmarshalling the file msg in kafka consumer %v", err)
+			}
+			log.Println("File msg received in consumer is :", fileEvent)
+
+			// upload the file to S3
+			url, err := s3.UploadFileToS3(fileEvent.TempFilePath, fileEvent.From)
+			if err != nil {
+				log.Println("error uplaoding the file to s3 :", err.Error())
+				continue
+			}
+
+			log.Println("sending file url on the broadcast channel")
+			channels.Broadcast_S3_FileURL <- url
+
 			sess.MarkMessage(message, "")
 
 		default:
@@ -131,4 +164,25 @@ func ConsumeMessages(ctx context.Context, brokers []string, groupID string, topi
 			return
 		}
 	}
+}
+
+func CreateChat(chatMsg *models.Chat) (interface{}, error) {
+
+	result := database.DB.Create(chatMsg)
+	if result.Error != nil {
+		return "", result.Error
+	}
+	log.Printf("message : %s saved in DB : ", chatMsg.Msg)
+
+	return chatMsg.Id, nil
+}
+
+func CreateActivity(activityEvent *models.ActivityEvent) (interface{}, error) {
+	result := database.DB.Create(activityEvent)
+	if result.Error != nil {
+		return "", result.Error
+	}
+	log.Printf("Activity : %s saved in DB : ", activityEvent.Action)
+
+	return activityEvent.Id, nil
 }

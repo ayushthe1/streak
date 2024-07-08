@@ -7,7 +7,6 @@ import (
 	"github.com/ayushthe1/streak/database"
 	"github.com/ayushthe1/streak/httpserver"
 	"github.com/ayushthe1/streak/kafka"
-	"github.com/ayushthe1/streak/upload"
 	"github.com/ayushthe1/streak/ws"
 )
 
@@ -15,7 +14,7 @@ func main() {
 	database.Connect()
 
 	var wg sync.WaitGroup
-	wg.Add(4)
+	wg.Add(3)
 
 	go func() {
 		// Decrement the counter when this goroutine completes
@@ -34,10 +33,10 @@ func main() {
 		kafka.StartKafkaConsumer()
 	}()
 
-	go func() {
-		defer wg.Done()
-		upload.SetupFileUpload()
-	}()
+	// go func() {
+	// 	defer wg.Done()
+	// 	upload.SetupFileUpload()
+	// }()
 
 	// Wait for both goroutines to complete
 	wg.Wait()

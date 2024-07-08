@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"sync"
 	"time"
@@ -63,6 +64,7 @@ func ServeWS(c *fiber.Ctx) error {
 		c.Locals("allowed", true)
 		c.Locals("mycustomFlag", true)
 		return websocket.New(func(conn *websocket.Conn) {
+			log.Println("*********** Websocket connection is established *********")
 
 			// Create a context for canceling the goroutine
 			ctx, cancel := context.WithCancel(context.Background())
@@ -88,30 +90,46 @@ func ServeWS(c *fiber.Ctx) error {
 					log.Printf("error deleting user %s from redis", client.Username)
 				}
 				cancel() // Cancel the goroutine
-				client.consumeCancel()
-				if client.consumerChannel != nil {
-					client.Conn.Close()
-					log.Println("consumer tag before vlosing : ", client.ConsumerTag)
-					msgqueue.RabbitChannel.Cancel(client.ConsumerTag, true)
-					log.Printf("Consumer tag for user %s is %s ", client.Username, client.ConsumerTag)
-					log.Println("Delivery stopped")
+				if client != nil {
+					if client.consumeCancel != nil {
+						client.consumeCancel()
+					}
+
+					if client.consumerChannel != nil {
+						if client.Conn != nil {
+							client.Conn.Close()
+						}
+						log.Println("consumer tag before closing: ", client.ConsumerTag)
+						if msgqueue.RabbitChannel != nil {
+							if err := msgqueue.RabbitChannel.Cancel(client.ConsumerTag, true); err != nil {
+								log.Printf("Failed to cancel RabbitMQ consumer: %v", err)
+							}
+						}
+						log.Printf("Consumer tag for user %s is %s ", client.Username, client.ConsumerTag)
+						log.Println("Delivery stopped")
+					}
 				}
 				// conn.Close()
-				logoutActivity := models.ActivityEvent{
-					Type:      kafka.ActivityMsgType,
-					Username:  client.Username,
-					Action:    "log out",
-					Timestamp: time.Now().Unix(),
-					Details:   fmt.Sprintf("User %s just logged out", client.Username),
-				}
 
-				if err := kafka.ProduceEventToKafka(kafka.ActivityTopic, logoutActivity); err != nil {
-					log.Printf("error producing logout activity %v", err)
+				if client.Username != "" {
+					logoutActivity := models.ActivityEvent{
+						Type:      kafka.ActivityMsgType,
+						Username:  client.Username,
+						Action:    "log out",
+						Timestamp: time.Now().Unix(),
+						Details:   fmt.Sprintf("User %s just logged out", client.Username),
+					}
+					if err := kafka.ProduceEventToKafka(kafka.ActivityTopic, logoutActivity); err != nil {
+						log.Printf("error producing logout activity %v", err)
 
+					}
 				}
 
 				clients.Lock()
-				delete(clients.m, client)
+				if client != nil {
+					delete(clients.m, client)
+				}
+
 				clients.Unlock()
 
 				log.Println("At end of defer close")
@@ -173,15 +191,17 @@ func receiveMessages(ctx context.Context, client *Client) {
 			}
 
 			// publish login activiy to kafka which will be sent to all users
-			loginActivity := models.ActivityEvent{
-				Type:      kafka.ActivityMsgType,
-				Username:  client.Username,
-				Action:    "login",
-				Timestamp: time.Now().Unix(),
-				Details:   fmt.Sprintf("User %s just logged in", client.Username),
-			}
-			if err := kafka.ProduceEventToKafka(kafka.ActivityTopic, loginActivity); err != nil {
-				log.Printf("Failed to produce loginActivity : %v", loginActivity)
+			if client.Username != "" {
+				loginActivity := models.ActivityEvent{
+					Type:      kafka.ActivityMsgType,
+					Username:  client.Username,
+					Action:    "login",
+					Timestamp: time.Now().Unix(),
+					Details:   fmt.Sprintf("User %s just logged in", client.Username),
+				}
+				if err := kafka.ProduceEventToKafka(kafka.ActivityTopic, loginActivity); err != nil {
+					log.Printf("Failed to produce loginActivity : %v", loginActivity)
+				}
 			}
 
 			// // deliver messages to user already stored in queue
@@ -203,14 +223,14 @@ func receiveMessages(ctx context.Context, client *Client) {
 
 			go deliverNotificationWhenUserIsOnline(ctx, client)
 
-		} else if m.Type == "chat" {
+		} else if m.Type == "message" {
 			// deliver message to the receiver
 			c := m.Chat
 			c.Timestamp = time.Now().Unix()
 			log.Println("The chat msg received is :", c.Msg)
 
 			chatMsg := c
-			// Publish the chat message to kafka
+			// Publish the chat message to kafka to save in DB
 			chatEvent := models.ChatEvent{
 				Type:    kafka.ChatMsgType,
 				ChatMsg: &chatMsg,
@@ -223,6 +243,22 @@ func receiveMessages(ctx context.Context, client *Client) {
 
 			// Irrespective of whether user is online or not, send the message to RabbitMQ
 			deliverMessageToUser(recieverUsername, &c)
+
+		} else if m.Type == "file" {
+
+			fileMsg := m.Chat
+			fileMsg.Timestamp = time.Now().Unix()
+			log.Println("The received file msg is : ", fileMsg)
+
+			fileEvent := models.ChatEvent{
+				Type:    kafka.ChatMsgType,
+				ChatMsg: &fileMsg,
+			}
+			if err := kafka.ProduceEventToKafka(kafka.FileTopic, fileEvent); err != nil {
+				log.Printf("Failed to produce chatevent : %v", err)
+			}
+
+			// todo : some more work is needed
 
 		} else {
 			log.Printf("Invalid Type : %s", m.Type)
@@ -351,6 +387,9 @@ func ConsumeMessages(ctx context.Context, client *Client) error {
 					log.Println("Failed to unmarshal chat message:", err)
 					continue
 				}
+				id := generateIDNumber()
+				chat.Id = uint(id)
+
 				log.Println("Chat is:", chat)
 
 				// Push the message to the WebSocket connection
@@ -408,4 +447,8 @@ func StartWebSocketServer() {
 	log.Println("Web Socket Server listening on port", port)
 	app.Listen(":" + port)
 
+}
+
+func generateIDNumber() int {
+	return rand.Intn(10000-1+1) + 1
 }
