@@ -4,6 +4,7 @@ import (
 	"log"
 	"sync"
 
+	"github.com/ayushthe1/streak/chatbot"
 	"github.com/ayushthe1/streak/database"
 	"github.com/ayushthe1/streak/httpserver"
 	"github.com/ayushthe1/streak/kafka"
@@ -32,6 +33,8 @@ func main() {
 		defer wg.Done()
 		kafka.StartKafkaConsumer()
 	}()
+
+	go chatbot.CreateChatBotUser()
 
 	// go func() {
 	// 	defer wg.Done()

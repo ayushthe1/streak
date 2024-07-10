@@ -15,6 +15,7 @@ func setupRoutes(app *fiber.App) {
 	public.Post("/login", handler.LoginHandler)
 	public.Post("/logout", handler.LogoutHandler)
 	public.Post("/verify-contact", handler.VerifyContactHandler)
+	// public.Post("/chatbot", chatbot.ChatbotHandler)
 
 	protected := app.Group("/api", middleware.IsAuthenticate)
 	protected.Get("/chat-history", handler.ChatHistoryHandler)

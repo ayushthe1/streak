@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/ayushthe1/streak/channels"
+	"github.com/ayushthe1/streak/chatbot"
 	"github.com/ayushthe1/streak/online"
 
 	"github.com/ayushthe1/streak/kafka"
@@ -23,12 +24,13 @@ import (
 )
 
 type Client struct {
-	Conn            *websocket.Conn
-	Username        string
-	cancel          context.CancelFunc      // for cancelling the goroutine
-	consumeCancel   context.CancelFunc      // for canceling the consume goroutine
-	consumerChannel <-chan amqp091.Delivery // Channel for consuming messages
-	ConsumerTag     string
+	Conn                *websocket.Conn
+	Username            string
+	cancel              context.CancelFunc      // for cancelling the goroutine
+	consumeCancel       context.CancelFunc      // for canceling the consume goroutine
+	consumerChannel     <-chan amqp091.Delivery // Channel for consuming messages
+	ConsumerTag         string
+	DialogFlowSessionID string // sessionID to be used in Dialogflow for chatbot
 }
 
 type Message struct {
@@ -69,8 +71,9 @@ func ServeWS(c *fiber.Ctx) error {
 			// Create a context for canceling the goroutine
 			ctx, cancel := context.WithCancel(context.Background())
 			client := &Client{
-				Conn:   conn,
-				cancel: cancel,
+				Conn:                conn,
+				cancel:              cancel,
+				DialogFlowSessionID: generateSessionID(),
 			}
 
 			clients.Lock()
@@ -207,7 +210,7 @@ func receiveMessages(ctx context.Context, client *Client) {
 			// // deliver messages to user already stored in queue
 			// log.Println("Calling ConsumeMessags function by :", client.Username)
 
-			// push a test msg to the queue
+			// push a test msg to the queue (necessary, don't remove)
 			var testChat models.Chat
 			testChat.Msg = "TEST"
 			sendMessageToQueue(client.Username, &testChat)
@@ -230,6 +233,7 @@ func receiveMessages(ctx context.Context, client *Client) {
 			log.Println("The chat msg received is :", c.Msg)
 
 			chatMsg := c
+
 			// Publish the chat message to kafka to save in DB
 			chatEvent := models.ChatEvent{
 				Type:    kafka.ChatMsgType,
@@ -241,8 +245,46 @@ func receiveMessages(ctx context.Context, client *Client) {
 
 			recieverUsername := c.To
 
-			// Irrespective of whether user is online or not, send the message to RabbitMQ
-			deliverMessageToUser(recieverUsername, &c)
+			if recieverUsername == "ChatBot" {
+				// If message is being sent to the chatbot
+				log.Println("Message is for ChatBot")
+
+				var chat models.Chat
+				chat.Timestamp = time.Now().Unix()
+				chat.From = recieverUsername
+				chat.To = c.From
+
+				responseFromChatBot, err := chatbot.ChatbotHandler(c.Msg, client.DialogFlowSessionID)
+				if err != nil {
+					msg := fmt.Sprintf("Sorry, some unknown error occurred : %s", err.Error())
+					chat.Msg = msg
+					deliverMessageToUser(c.From, &chat)
+					return
+				}
+
+				log.Println("RESPONSE FROM CHATBOT : ", responseFromChatBot)
+
+				chat.Msg = responseFromChatBot
+
+				c2 := chat
+
+				log.Println("CHAT IS :", chat)
+				deliverMessageToUser(c.From, &chat)
+
+				// Publish the chat message to kafka to save in DB
+				chatEvent := models.ChatEvent{
+					Type:    kafka.ChatMsgType,
+					ChatMsg: &c2,
+				}
+				if err := kafka.ProduceEventToKafka(kafka.ChatTopic, chatEvent); err != nil {
+					log.Printf("Failed to produce chatevent : %v", err)
+				}
+
+			} else {
+				// If message is being sent to any other user
+				// Irrespective of whether user is online or not, send the message to RabbitMQ
+				deliverMessageToUser(recieverUsername, &c)
+			}
 
 		} else if m.Type == "file" {
 
@@ -451,4 +493,13 @@ func StartWebSocketServer() {
 
 func generateIDNumber() int {
 	return rand.Intn(10000-1+1) + 1
+}
+
+func generateSessionID() string {
+	rand.Seed(time.Now().UnixNano())
+
+	charset := "abcdefghiklmnopqrstuvwxyz12345"
+
+	c := charset[rand.Intn(len(charset))]
+	return string(c)
 }
