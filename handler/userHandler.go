@@ -2,6 +2,7 @@ package handler
 
 import (
 	"log"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -9,6 +10,7 @@ import (
 	"github.com/ayushthe1/streak/database"
 	"github.com/ayushthe1/streak/models"
 	util "github.com/ayushthe1/streak/utils"
+	"github.com/ayushthe1/streak/wv"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
@@ -68,6 +70,14 @@ func SignupHandler(c *fiber.Ctx) error {
 	}
 
 	c.Cookie(&cookie)
+
+	err := wv.CreateNewTenant(user.Username)
+	if err != nil {
+		c.Status(http.StatusInternalServerError)
+		return c.JSON(fiber.Map{
+			"error creating tenant": err,
+		})
+	}
 
 	return c.JSON(fiber.Map{
 		"user":    user, // remove this later

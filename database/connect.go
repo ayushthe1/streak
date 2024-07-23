@@ -6,6 +6,7 @@ import (
 
 	"github.com/ayushthe1/streak/models"
 	"github.com/ayushthe1/streak/msgqueue"
+	"github.com/ayushthe1/streak/wv"
 	"github.com/joho/godotenv"
 	redis "github.com/redis/go-redis/v9"
 	"gorm.io/driver/postgres"
@@ -40,6 +41,8 @@ func Connect() {
 	)
 
 	msgqueue.ConnectoRabbitMQ()
+
+	wv.ConnectToWeaviate()
 
 	// redisAddress := os.Getenv("REDIS_ADDRESS")
 	// rdb := redis.NewClient(&redis.Options{

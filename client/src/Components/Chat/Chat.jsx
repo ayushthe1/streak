@@ -1,6 +1,7 @@
 
 import React, { Component } from 'react';
 import axios from 'axios';
+import SearchBar from '../Searchbar';
 
 import SocketConnection from '../../socket-connection';
 
@@ -22,6 +23,8 @@ import {
   TabPanel,
   VStack,
   Text,
+  Modal, ModalOverlay, ModalContent, 
+  ModalHeader, ModalBody, ModalCloseButton,
 } from '@chakra-ui/react';
 
 import ChatHistory from './ChatHistory';
@@ -45,7 +48,9 @@ class Chat extends Component {
       activities: [],
       msgs: [],
       file: null,
-      fileUrl: ''
+      fileUrl: '',
+      searchResults: [],
+      isSearchModalOpen: false,
     };
   }
 
@@ -91,6 +96,14 @@ class Chat extends Component {
     console.log('exiting');
   };
 
+  handleSearchResults = (response) => {
+    const results = response.result.data.Get.Users;
+    this.setState({ searchResults: results, isSearchModalOpen: true });
+  }
+
+  closeSearchModal = () => {
+    this.setState({ isSearchModalOpen: false });
+  }
 
   fetchInitialActivities = async () => {
     try {
@@ -224,32 +237,6 @@ onSubmit = async e => {
     }
   };
 
-  addContact = async e => {
-    e.preventDefault();
-    try {
-      const res = await axios.post(`${this.state.endpoint}/verify-contact`, {
-        username: this.state.contact,
-      });
-
-      console.log(res.data);
-      if (!res.status) {
-        this.setState({ isInvalid: true });
-      } else {
-        // reset state on success
-        this.setState({ isInvalid: false });
-
-        let contacts = this.state.contacts;
-        contacts.unshift({ // add the new contact to the contacts list
-          username: this.state.contact,
-          last_activity: Date.now() / 1000,
-        });
-        this.renderContactList(contacts);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   renderChatHistory = (currentUser, chats) => {
     const history = ChatHistory(currentUser, chats);
     this.setState({ chatHistory: history });
@@ -266,220 +253,246 @@ onSubmit = async e => {
     this.fetchChatHistory(this.state.username, to);
   };
 
-//   render() {
-//     return (
-//       <Container>
-//         <p style={{ textAlign: 'right', paddingBottom: '10px' }}>
-//           {this.state.username}
-//         </p>
-//         <Container paddingBottom={2}>
-//           <Box>
-//             <FormControl isInvalid={this.state.isInvalid}>
-//               <InputGroup size="md">
-//                 <Input
-//                   variant="flushed"
-//                   type="text"
-//                   placeholder="Add Contact"
-//                   name="contact"
-//                   value={this.state.contact}
-//                   onChange={this.onChange}
-//                 />
-//                 <InputRightElement width="6rem">
-//                   <Button
-//                     colorScheme={'teal'}
-//                     h="2rem"
-//                     size="lg"
-//                     variant="solid"
-//                     type="submit"
-//                     onClick={this.addContact}
-//                   >
-//                     Add
-//                   </Button>
-//                 </InputRightElement>
-//               </InputGroup>
-//               {!this.state.isContactInvalid ? (
-//                 ''
-//               ) : (
-//                 <FormErrorMessage>contact does not exist</FormErrorMessage>
-//               )}
-//             </FormControl>
-//           </Box>
-//         </Container>
-//         <Flex>
-//           <Box
-//             textAlign={'left'}
-//             overflowY={'scroll'}
-//             flex="1"
-//             h={'32rem'}
-//             borderWidth={1}
-//             borderRightWidth={0}
-//             borderRadius={'xl'}
-//           >
-//             {this.state.renderContactList}
-//           </Box>
-
-//           <Box flex="2">
-//             <Container
-//               borderWidth={1}
-//               borderLeftWidth={0}
-//               borderBottomWidth={0}
-//               borderRadius={'xl'}
-//               textAlign={'right'}
-//               h={'25rem'}
-//               padding={2}
-//               overflowY={'scroll'}
-//               display="flex"
-//               flexDirection={'column-reverse'}
-//             >
-//               {this.state.chatHistory}
-//             </Container>
-
-//             <Box flex="1">
-//               <FormControl onKeyDown={this.onSubmit} onSubmit={this.onSubmit}>
-//                 <Textarea
-//                   type="submit"
-//                   borderWidth={1}
-//                   borderRadius={'xl'}
-//                   minH={'7rem'}
-//                   placeholder="Aur Sunao... Press enter to send..."
-//                   size="lg"
-//                   resize={'none'}
-//                   name="message"
-//                   value={this.state.message}
-//                   onChange={this.onChange}
-//                   isDisabled={this.state.to === ''}
-//                 />
-//                 <Input
-//                   type="file"
-//                   name="file"
-//                   onChange={this.onFileChange}
-//                 />
-//               </FormControl>
-//             </Box>
-//           </Box>
-//         </Flex>
-//       </Container>
-//     );
-//   }
-// }
-
-// export default Chat;
-
-render() {
-  return (
-    <Container>
-      <p style={{ textAlign: 'right', paddingBottom: '10px' }}>
-        {this.state.username}
-      </p>
-      <Container paddingBottom={2}>
-        <Box>
-          <FormControl isInvalid={this.state.isInvalid}>
-            <InputGroup size="md">
-              <Input
-                variant="flushed"
-                type="text"
-                placeholder="Add Contact"
-                name="contact"
-                value={this.state.contact}
-                onChange={this.onChange}
-              />
-              <InputRightElement width="6rem">
-                <Button
-                  colorScheme={'teal'}
-                  h="2rem"
-                  size="lg"
-                  variant="solid"
-                  type="submit"
-                  onClick={this.addContact}
-                >
-                  Add
-                </Button>
-              </InputRightElement>
-            </InputGroup>
-            {!this.state.isContactInvalid ? (
-              ''
-            ) : (
-              <FormErrorMessage>contact does not exist</FormErrorMessage>
-            )}
-          </FormControl>
-        </Box>
-      </Container>
-      <Tabs>
-        <TabList>
-          <Tab>Chat</Tab>
-          <Tab>Activity</Tab>
-        </TabList>
-        <TabPanels>
-          <TabPanel>
-            <Flex>
-              <Box
-                textAlign={'left'}
-                overflowY={'scroll'}
-                flex="1"
-                h={'32rem'}
-                borderWidth={1}
-                borderRightWidth={0}
-                borderRadius={'xl'}
-              >
-                {this.state.renderContactList}
-              </Box>
-
-              <Box flex="2">
-                <Container
-                  borderWidth={1}
-                  borderLeftWidth={0}
-                  borderBottomWidth={0}
-                  borderRadius={'xl'}
-                  textAlign={'right'}
-                  h={'25rem'}
-                  padding={2}
-                  overflowY={'scroll'}
-                  display="flex"
-                  flexDirection={'column-reverse'}
-                >
-                  {this.state.chatHistory}
-                </Container>
-
-                <Box flex="1">
-                  <FormControl onKeyDown={this.onSubmit} onSubmit={this.onSubmit}>
-                    <Textarea
-                      type="submit"
-                      borderWidth={1}
-                      borderRadius={'xl'}
-                      minH={'7rem'}
-                      placeholder="Aur Sunao... Press enter to send..."
-                      size="lg"
-                      resize={'none'}
-                      name="message"
-                      value={this.state.message}
-                      onChange={this.onChange}
-                      isDisabled={this.state.to === ''}
-                    />
-                    <Input type="file" name="file" onChange={this.onFileChange} />
-                  </FormControl>
-                </Box>
-              </Box>
+  render() {
+    return (
+      <Box bg="gray.900" minHeight="100vh" p={5}>
+        <Container maxW="container.xl">
+          <Flex direction="column" h="95vh">
+            <Flex justify="space-between" align="center" mb={4}>
+              <SearchBar from={this.state.username} onSearchResults={this.handleSearchResults} />
+              <Text color="purple.300" fontWeight="bold">
+                {this.state.username}
+              </Text>
             </Flex>
-          </TabPanel>
-          <TabPanel>
-            <Box p={4}>
-              <VStack spacing={4} align="stretch">
-                {this.state.activities.map((activity, index) => (
-                  <Box key={index} p={4} borderWidth="1px" borderRadius="lg">
-                    <Text>{activity.username}</Text>
-                    <Text>{activity.action}</Text>
-                    <Text>{new Date(activity.timestamp * 1000).toLocaleString()}</Text>
-                    <Text>{activity.details}</Text>
+            
+            <Box bg="gray.800" borderRadius="xl" overflow="hidden" boxShadow="xl" flex={1}>
+              <Flex h="100%">
+                <Box w="300px" bg="gray.700" overflowY="auto" borderRightWidth={1} borderColor="gray.600">
+                  <Box p={4}>
+                    <FormControl isInvalid={this.state.isInvalid} mb={4}>
+                      <InputGroup size="md">
+                        <Input
+                          bg="gray.600"
+                          color="white"
+                          border="none"
+                          placeholder="Add Contact"
+                          name="contact"
+                          value={this.state.contact}
+                          onChange={this.onChange}
+                        />
+                        <InputRightElement width="4.5rem">
+                          <Button
+                            h="1.75rem"
+                            size="sm"
+                            colorScheme="purple"
+                            onClick={this.addContact}
+                          >
+                            Add
+                          </Button>
+                        </InputRightElement>
+                      </InputGroup>
+                      {this.state.isContactInvalid && (
+                        <FormErrorMessage>Contact does not exist</FormErrorMessage>
+                      )}
+                    </FormControl>
+                    {this.state.renderContactList}
                   </Box>
-                ))}
-              </VStack>
+                </Box>
+                
+                <Flex direction="column" flex={1}>
+                  <Box flex={1} overflowY="auto" p={4} bg="gray.800">
+                    {this.state.chatHistory}
+                  </Box>
+                  
+                  <Box p={4} bg="gray.700">
+                    <FormControl onKeyDown={this.onSubmit} onSubmit={this.onSubmit}>
+                      <Textarea
+                        bg="gray.600"
+                        color="white"
+                        border="none"
+                        borderRadius="md"
+                        placeholder="Type your message here... Press enter to send"
+                        _placeholder={{ color: "gray.400" }}
+                        mb={2}
+                        name="message"
+                        value={this.state.message}
+                        onChange={this.onChange}
+                        isDisabled={this.state.to === ''}
+                      />
+                      <Flex justify="space-between" align="center">
+                        <Input
+                          type="file"
+                          name="file"
+                          onChange={this.onFileChange}
+                          hidden
+                          id="file-upload"
+                        />
+                        <Button as="label" htmlFor="file-upload" colorScheme="purple" size="sm">
+                          Attach File
+                        </Button>
+                        <Button colorScheme="purple" size="sm" onClick={this.onSubmit}>
+                          Send
+                        </Button>
+                      </Flex>
+                    </FormControl>
+                  </Box>
+                </Flex>
+              </Flex>
             </Box>
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
-    </Container>
-  );
-}
+          </Flex>
+  
+          <Modal isOpen={this.state.isSearchModalOpen} onClose={this.closeSearchModal} size="xl">
+            <ModalOverlay />
+            <ModalContent bg="gray.800" color="white">
+              <ModalHeader bg="purple.600">Search Results</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody p={6}>
+                <VStack spacing={4} align="stretch">
+                  {this.state.searchResults.map((result, index) => (
+                    <Box 
+                      key={index} 
+                      p={4} 
+                      borderWidth="1px"
+                      borderColor="gray.600"
+                      borderRadius="md" 
+                      boxShadow="md"
+                      bg="gray.700"
+                      _hover={{ bg: "gray.600" }}
+                      transition="background-color 0.2s"
+                    >
+                      <Text fontSize="lg" fontWeight="bold" color="purple.300" mb={2}>
+                        To: {result.to}
+                      </Text>
+                      <Text fontSize="md" color="gray.300">
+                        {result.message}
+                      </Text>
+                    </Box>
+                  ))}
+                </VStack>
+              </ModalBody>
+            </ModalContent>
+          </Modal>
+        </Container>
+      </Box>
+    );
+  }
 }
 
 export default Chat;
+
+// render() {
+//   return (
+//     <Container>
+//         <SearchBar from={this.state.username} onSearchResults={this.handleSearchResults} />
+//       <p style={{ textAlign: 'right', paddingBottom: '10px' }}>
+//         {this.state.username}
+//       </p>
+//       <Tabs>
+//         <TabList>
+//           <Tab>Chat</Tab>
+//           <Tab>Activity</Tab>
+//         </TabList>
+//         <TabPanels>
+//           <TabPanel>
+//             <Flex>
+//               <Box
+//                 textAlign={'left'}
+//                 overflowY={'scroll'}
+//                 flex="1"
+//                 h={'32rem'}
+//                 borderWidth={1}
+//                 borderRightWidth={0}
+//                 borderRadius={'xl'}
+//               >
+//                 {this.state.renderContactList}
+//               </Box>
+
+//               <Box flex="2">
+//                 <Container
+//                   borderWidth={1}
+//                   borderLeftWidth={0}
+//                   borderBottomWidth={0}
+//                   borderRadius={'xl'}
+//                   textAlign={'right'}
+//                   h={'25rem'}
+//                   padding={2}
+//                   overflowY={'scroll'}
+//                   display="flex"
+//                   flexDirection={'column-reverse'}
+//                 >
+//                   {this.state.chatHistory}
+//                 </Container>
+
+//                 <Box flex="1">
+//                   <FormControl onKeyDown={this.onSubmit} onSubmit={this.onSubmit}>
+//                     <Textarea
+//                       type="submit"
+//                       borderWidth={1}
+//                       borderRadius={'xl'}
+//                       minH={'7rem'}
+//                       placeholder="Aur Sunao... Press enter to send..."
+//                       size="lg"
+//                       resize={'none'}
+//                       name="message"
+//                       value={this.state.message}
+//                       onChange={this.onChange}
+//                       isDisabled={this.state.to === ''}
+//                     />
+//                     <Input type="file" name="file" onChange={this.onFileChange} />
+//                   </FormControl>
+//                 </Box>
+//               </Box>
+//             </Flex>
+//           </TabPanel>
+//           <TabPanel>
+//             <Box p={4}>
+//               <VStack spacing={4} align="stretch">
+//                 {this.state.activities.map((activity, index) => (
+//                   <Box key={index} p={4} borderWidth="1px" borderRadius="lg">
+//                     <Text>{activity.username}</Text>
+//                     <Text>{activity.action}</Text>
+//                     <Text>{new Date(activity.timestamp * 1000).toLocaleString()}</Text>
+//                     <Text>{activity.details}</Text>
+//                   </Box>
+//                 ))}
+//               </VStack>
+//             </Box>
+//           </TabPanel>
+//         </TabPanels>
+//       </Tabs>
+//       <Modal isOpen={this.state.isSearchModalOpen} onClose={this.closeSearchModal} size="xl">
+//         <ModalOverlay />
+//         <ModalContent>
+//           <ModalHeader bg="blue.500" color="white">Search Results</ModalHeader>
+//           <ModalCloseButton color="white" />
+//           <ModalBody p={6}>
+//             <VStack spacing={4} align="stretch">
+//               {this.state.searchResults.map((result, index) => (
+//                 <Box 
+//                   key={index} 
+//                   p={4} 
+//                   borderWidth="1px" 
+//                   borderRadius="lg" 
+//                   boxShadow="md"
+//                   bg="gray.50"
+//                   _hover={{ bg: "gray.100" }}
+//                   transition="background-color 0.2s"
+//                 >
+//                   <Text fontSize="lg" fontWeight="bold" color="blue.600" mb={2}>
+//                     To: {result.to}
+//                   </Text>
+//                   <Text fontSize="md" color="gray.700">
+//                     {result.message}
+//                   </Text>
+//                 </Box>
+//               ))}
+//             </VStack>
+//           </ModalBody>
+//         </ModalContent>
+//       </Modal>
+//     </Container>
+//   );
+// }
+// }
+
+// export default Chat;

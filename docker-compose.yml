@@ -28,7 +28,7 @@ services:
     depends_on:
       - kafka
     ports:
-      - "8080:8080"
+      - "8082:8080"
     environment:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
@@ -47,6 +47,29 @@ services:
     restart: always
     ports:
       - 6379:6379
+
+  weaviate:
+    image: cr.weaviate.io/semitechnologies/weaviate:1.24.20
+    restart: on-failure:0
+    ports:
+     - 8080:8080
+     - 50051:50051
+    environment:
+      QUERY_DEFAULTS_LIMIT: 20
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
+      PERSISTENCE_DATA_PATH: "./data"
+      ENABLE_MODULES: 'text2vec-transformers,generative-ollama'
+      DEFAULT_VECTORIZER_MODULE: text2vec-transformers
+      TRANSFORMERS_INFERENCE_API: http://t2v-transformers:8080
+      CLUSTER_HOSTNAME: 'node1'
+  t2v-transformers:  # Set the name of the inference container
+    image: cr.weaviate.io/semitechnologies/transformers-inference:sentence-transformers-multi-qa-MiniLM-L6-cos-v1
+    environment:
+      ENABLE_CUDA: 0 # set to 1 to enable
+  # qna-transformers:
+  #   image: cr.weaviate.io/semitechnologies/qna-transformers:bert-large-uncased-whole-word-masking-finetuned-squad
+  #   environment:
+  #     ENABLE_CUDA: 0
   # rabbitmq:
   #   image: rabbitmq:3-management-alpine
   #   container_name: rabbitmq

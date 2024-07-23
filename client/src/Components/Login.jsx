@@ -186,8 +186,15 @@ class Login extends Component {
     }
 
     return (
-      <Container marginBlockStart={10} textAlign={'left'} maxW="2xl">
-        <Box borderRadius="lg" padding={10} borderWidth="2px">
+      <Container marginBlockStart={10} textAlign="center" maxW="sm">
+        <Box
+          borderRadius="lg"
+          p={10}
+          borderWidth="2px"
+          bg="gray.800"
+          color="white"
+          boxShadow="lg"
+        >
           <form onSubmit={this.onSubmit}>
             <Stack spacing={5}>
               <FormControl isInvalid={this.state.isInvalid}>
@@ -198,6 +205,10 @@ class Login extends Component {
                   name="username"
                   value={this.state.username}
                   onChange={this.onChange}
+                  bg="gray.700"
+                  color="white"
+                  border="none"
+                  _placeholder={{ color: 'gray.400' }}
                 />
               </FormControl>
               <FormControl isInvalid={this.state.isInvalid}>
@@ -208,32 +219,40 @@ class Login extends Component {
                   name="password"
                   value={this.state.password}
                   onChange={this.onChange}
+                  bg="gray.700"
+                  color="white"
+                  border="none"
+                  _placeholder={{ color: 'gray.400' }}
                 />
                 {this.state.isInvalid && (
                   <FormErrorMessage>
-                    invalid username or password
+                    Invalid username or password
                   </FormErrorMessage>
                 )}
               </FormControl>
               <Button
                 size="lg"
                 leftIcon={<EditIcon />}
-                colorScheme="green"
+                colorScheme="purple"
                 variant="solid"
                 type="submit"
+                boxShadow="md"
+                _hover={{ boxShadow: 'xl' }}
+                transition="box-shadow 0.2s"
               >
                 Login
               </Button>
             </Stack>
           </form>
-          <Box paddingTop={3}>
-            <Text as="i" fontSize={'lg'} color={'red'}>
+          <Box pt={3}>
+            <Text as="i" fontSize="lg" color="red.300">
               {this.state.message}
             </Text>
           </Box>
         </Box>
       </Container>
     );
+    
   }
 }
 

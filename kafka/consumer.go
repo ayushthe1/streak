@@ -9,6 +9,7 @@ import (
 	s3 "github.com/ayushthe1/streak/S3"
 	"github.com/ayushthe1/streak/channels"
 	"github.com/ayushthe1/streak/database"
+	"github.com/ayushthe1/streak/wv"
 
 	// "github.com/ayushthe1/streak/handler"
 
@@ -111,6 +112,15 @@ func (consumer) ConsumeClaim(sess sarama.ConsumerGroupSession, claim sarama.Cons
 				log.Fatalf("unabe to save chat msg in db : %s", err.Error())
 			}
 			sess.MarkMessage(message, "")
+
+			// save the chat in Weaviate
+			err = wv.AddNewChatIntoWeaviate(chat)
+			if err != nil {
+				log.Println("ERROR SAVING CHAT TO WEAVIATE")
+				continue
+			}
+			log.Println("CHAT SUUCESSFULLY SAVED IN WEAVIATE :", chat)
+
 		case FileMsgType:
 			var fileEvent models.File
 			err := json.Unmarshal(message.Value, &fileEvent)
