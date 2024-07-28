@@ -10,7 +10,7 @@ import (
 )
 
 func StartKafkaConsumer() {
-	brokers := []string{"localhost:9092"}
+	brokers := []string{"kafka:29092"}
 	if err := InitProducer(brokers); err != nil {
 		log.Fatalf("Failed to initialize Kafka producer: %s", err)
 	}

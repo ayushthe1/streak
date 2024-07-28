@@ -1,0 +1,7 @@
+global:
+  scrape_interval: 5s  # Increased to reduce load
+
+scrape_configs:
+  - job_name: 'go-app'
+    static_configs:
+      - targets: ['go-app:3000']

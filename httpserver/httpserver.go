@@ -3,6 +3,7 @@ package httpserver
 import (
 	"log"
 
+	"github.com/ansrivas/fiberprometheus/v2"
 	"github.com/ayushthe1/streak/handler"
 	"github.com/ayushthe1/streak/middleware"
 	"github.com/gofiber/fiber/v2"
@@ -29,8 +30,13 @@ func setupRoutes(app *fiber.App) {
 func StartHttpServer() {
 	app := fiber.New()
 
+	// Setup Prometheus for metrics collection
+	prometheus := fiberprometheus.New("streak-service")
+	prometheus.RegisterAt(app, "/metrics")
+	app.Use(prometheus.Middleware)
+
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://localhost:4000 ",
+		AllowOrigins:     "http://frontend:4000, http://localhost:4000, http://host.docker.internal:4000 ",
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
 		AllowCredentials: true,
 	}))

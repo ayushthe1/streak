@@ -45,8 +45,8 @@ services:
   redis-db:
     image:  redis
     restart: always
-    ports:
-      - 6379:6379
+    # ports:
+    #   - 6379:6379
 
   weaviate:
     image: cr.weaviate.io/semitechnologies/weaviate:1.24.20
@@ -82,3 +82,72 @@ services:
   #     - ${HOME}/dev-rabbitmq/log/:/var/log/rabbitmq
   #   restart: always
 
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+  
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3003:3000"
+    volumes:
+      - grafana-storage:/var/lib/grafana
+    depends_on:
+      - prometheus
+
+  go-app:
+    build:
+      context: ./
+      dockerfile: backend.dockerfile
+    restart: always
+    ports:
+      - 3000:3000
+      - 3001:3001
+    depends_on:
+      - rabbitmq
+      - db
+      - redis-db
+      - weaviate
+      - kafka
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    ports:
+      - 5672:5672   # for sender and consumer connections
+      - 15672:15672 # for serve RabbitMQ GUI
+    volumes:
+      - ${HOME}/dev-rabbitmq/data/:/var/lib/rabbitmq
+      - ${HOME}/dev-rabbitmq/log/:/var/log/rabbitmq
+    restart: always
+
+  frontend:
+    restart: always
+    build:
+      context: ./
+      dockerfile: frontend.dockerfile
+    ports:
+      - 4000:4000
+
+  caddy:
+    image: caddy
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+
+
+volumes:
+  grafana-storage:
