@@ -24,7 +24,7 @@
 //       password: '',
 //       message: '',
 //       isInvalid: false,
-//       endpoint: 'https://streak.ayushsharma.co.in/api/login',
+//       endpoint: 'https://api.ayushsharma.co.in/api/login',
 //       redirect: false,
 //       redirectTo: '/chat?u=',
 //     };
@@ -146,7 +146,7 @@ class Login extends Component {
       password: '',
       message: '',
       isInvalid: false,
-      endpoint: 'https://streak.ayushsharma.co.in/api/login',
+      endpoint: 'https://api.ayushsharma.co.in/api/login',
       redirect: false,
       redirectTo: '/chat?u=',
     };

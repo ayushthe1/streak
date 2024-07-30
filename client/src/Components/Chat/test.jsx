@@ -7,7 +7,7 @@
 //         message: '',
 //         to: '',
 //         isInvalid: false,
-//         endpoint: 'https://streak.ayushsharma.co.in/api',
+//         endpoint: 'https://api.ayushsharma.co.in/api',
 //         contact: '',
 //         contacts: [],
 //         renderContactList: [],

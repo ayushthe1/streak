@@ -4,20 +4,20 @@ import { Box, Text, VStack, Container } from '@chakra-ui/react';
 const ActivityPage = () => {
   const [activities, setActivities] = useState([]);
 
-  useEffect(() => {
-    const ws = new WebSocket('ws://localhost:3000/ws'); // Update the WebSocket URL accordingly
+  // useEffect(() => {
+  //   const ws = new WebSocket('ws://localhost:3001/ws'); // Update the WebSocket URL accordingly
 
-    ws.onmessage = (event) => {
-      const message = JSON.parse(event.data);
-      if (message.type === 'activity') {
-        setActivities((prevActivities) => [message, ...prevActivities]);
-      }
-    };
+  //   ws.onmessage = (event) => {
+  //     const message = JSON.parse(event.data);
+  //     if (message.type === 'activity') {
+  //       setActivities((prevActivities) => [message, ...prevActivities]);
+  //     }
+  //   };
 
-    return () => {
-      ws.close();
-    };
-  }, []);
+  //   return () => {
+  //     ws.close();
+  //   };
+  // }, []);
 
   return (
     <Box p={4} bg="gray.900" minHeight="100vh">

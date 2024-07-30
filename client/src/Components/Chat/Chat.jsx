@@ -39,7 +39,7 @@ class Chat extends Component {
       message: '',
       to: '',
       isInvalid: false,
-      endpoint: 'https://streak.ayushsharma.co.in/api',
+      endpoint: 'https://api.ayushsharma.co.in/api',
       contact: '',
       contacts: [],
       renderContactList: [],
@@ -69,9 +69,10 @@ class Chat extends Component {
       console.log("Message is :", msg);
 
       if (msg.type === 'activity') {
-        this.setState((prevState) => ({
-          activities: [msg, ...prevState.activities],
-        }));
+        // this.setState((prevState) => ({
+        //   activities: [msg, ...prevState.activities],
+        // }));
+        console.log("activity received")
       } else {
 
       // update UI only when message is between from and to
@@ -224,7 +225,7 @@ onSubmit = async e => {
 
   fetchChatHistory = async (u1 = 'user1', u2 = 'user2') => {
     const res = await axios.get(
-      `https://streak.ayushsharma.co.in/api/chat-history?u1=${u1}&u2=${u2}`, { withCredentials: true }
+      `https://api.ayushsharma.co.in/api/chat-history?u1=${u1}&u2=${u2}`, { withCredentials: true }
     );
 
     console.log(res.data);
