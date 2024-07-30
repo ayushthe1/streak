@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/ansrivas/fiberprometheus/v2"
+	"github.com/ayushthe1/streak/chatbot"
 	"github.com/ayushthe1/streak/handler"
 	"github.com/ayushthe1/streak/middleware"
 	"github.com/gofiber/fiber/v2"
@@ -17,6 +18,7 @@ func setupRoutes(app *fiber.App) {
 	public.Post("/logout", handler.LogoutHandler)
 	public.Post("/verify-contact", handler.VerifyContactHandler)
 	public.Post("/wv", handler.GetQueryDataFromWeaviate)
+	public.Post("/hook", chatbot.WebhookHandler)
 	// public.Post("/chatbot", chatbot.ChatbotHandler)
 
 	protected := app.Group("/api", middleware.IsAuthenticate)
