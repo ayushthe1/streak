@@ -38,7 +38,7 @@ func StartHttpServer() {
 	app.Use(prometheus.Middleware)
 
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://frontend:4000, http://localhost:4000, http://host.docker.internal:4000 ",
+		AllowOrigins:     "http://frontend:4000, https://streak.ayushsharma.co.in, http://host.docker.internal:4000 ",
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
 		AllowCredentials: true,
 	}))

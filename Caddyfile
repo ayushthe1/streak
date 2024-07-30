@@ -1,10 +1,22 @@
 # :4000 {
 #     reverse_proxy frontend:4000
 # }
-:3000 {
+# :3000 {
+#     reverse_proxy go-app:3000
+# }
+
+# :3001 {
+#     reverse_proxy go-app:3001
+# }
+
+streak.ayushsharma.co.in {
+    reverse_proxy frontend:4000
+}
+
+api.ayushsharma.co.in {
     reverse_proxy go-app:3000
 }
 
-:3001 {
+ws.ayushsharma.co.in {
     reverse_proxy go-app:3001
 }

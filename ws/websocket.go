@@ -470,7 +470,7 @@ func sendMessageToQueue(username string, chat *models.Chat) error {
 
 func Setup(app *fiber.App) {
 	// app.Use(middleware.IsAuthenticate)
-	app.Get("/ws", ServeWS)
+	app.Get("/", ServeWS)
 }
 
 func StartWebSocketServer() {
@@ -479,7 +479,7 @@ func StartWebSocketServer() {
 	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://localhost:4000 ",
+		AllowOrigins:     "http://localhost:4000 ,https://streak.ayushsharma.co.in",
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
 		AllowCredentials: true,
 	}))

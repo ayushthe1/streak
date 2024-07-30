@@ -24,7 +24,7 @@ class Register extends Component {
       password: '',
       message: '',
       isInvalid: false,
-      endpoint: 'http://localhost:3000/api/register',
+      endpoint: 'https://streak.ayushsharma.co.in/api/register',
       redirect: false,
       redirectTo: '/chat?u=',
     };

@@ -39,7 +39,7 @@ class Chat extends Component {
       message: '',
       to: '',
       isInvalid: false,
-      endpoint: 'http://localhost:3000/api',
+      endpoint: 'https://streak.ayushsharma.co.in/api',
       contact: '',
       contacts: [],
       renderContactList: [],
@@ -224,7 +224,7 @@ onSubmit = async e => {
 
   fetchChatHistory = async (u1 = 'user1', u2 = 'user2') => {
     const res = await axios.get(
-      `http://localhost:3000/api/chat-history?u1=${u1}&u2=${u2}`, { withCredentials: true }
+      `https://streak.ayushsharma.co.in/api/chat-history?u1=${u1}&u2=${u2}`, { withCredentials: true }
     );
 
     console.log(res.data);

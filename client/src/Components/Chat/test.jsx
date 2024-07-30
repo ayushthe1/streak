@@ -7,7 +7,7 @@
 //         message: '',
 //         to: '',
 //         isInvalid: false,
-//         endpoint: 'http://localhost:3000/api',
+//         endpoint: 'https://streak.ayushsharma.co.in/api',
 //         contact: '',
 //         contacts: [],
 //         renderContactList: [],
