@@ -51,6 +51,7 @@ class Chat extends Component {
       fileUrl: '',
       searchResults: [],
       isSearchModalOpen: false,
+      selectedContact: '',
     };
   }
 
@@ -211,16 +212,17 @@ onSubmit = async e => {
 
 
 
-  getContacts = async user => {
-    const res = await axios.get(
-      `${this.state.endpoint}/contact-list?username=${user}`, { withCredentials: true } // get all the contacts for the given username
-    );
-    console.log(res.data);
-    if (res.data['data'] !== undefined) {
-      this.setState({ contacts: res.data.data }); // add all contacts to the contacts array
-      this.renderContactList(res.data.data);
-    }
-  };
+getContacts = async user => {
+  const res = await axios.get(
+    `${this.state.endpoint}/contact-list?username=${user}`, { withCredentials: true }
+  );
+  console.log(res.data);
+  if (res.data['data'] !== undefined) {
+    this.setState({ contacts: res.data.data }, () => {
+      this.renderContactList(this.state.contacts);
+    });
+  }
+};
 
   fetchChatHistory = async (u1 = 'user1', u2 = 'user2') => {
     const res = await axios.get(
@@ -243,14 +245,15 @@ onSubmit = async e => {
   };
 
   renderContactList = contacts => {
-    const renderContactList = ContactList(contacts, this.sendMessageTo);
-
+    const renderContactList = ContactList(contacts, this.sendMessageTo, this.state.selectedContact);
     this.setState({ renderContactList });
   };
 
   sendMessageTo = to => {
-    this.setState({ to });
-    this.fetchChatHistory(this.state.username, to);
+    this.setState({ to, selectedContact: to }, () => {
+      this.renderContactList(this.state.contacts);
+      this.fetchChatHistory(this.state.username, to);
+    });
   };
 
   render() {
@@ -305,6 +308,7 @@ onSubmit = async e => {
                   </Box>
                   
                   <Box p={4} bg="gray.700">
+                  {this.state.to !== '' ? (
                     <FormControl onKeyDown={this.onSubmit} onSubmit={this.onSubmit}>
                       <Textarea
                         bg="gray.600"
@@ -317,7 +321,6 @@ onSubmit = async e => {
                         name="message"
                         value={this.state.message}
                         onChange={this.onChange}
-                        isDisabled={this.state.to === ''}
                       />
                       <Flex justify="space-between" align="center">
                         <Input
@@ -335,6 +338,9 @@ onSubmit = async e => {
                         </Button>
                       </Flex>
                     </FormControl>
+                    ) : (
+                      <Text color="gray.400">Select a contact to start chatting</Text>
+                    )}
                   </Box>
                 </Flex>
               </Flex>
