@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import {
   Box,
   Input,
-  Button,
   InputGroup,
   InputRightElement,
   useToast,
+  IconButton,
 } from '@chakra-ui/react';
 import { SearchIcon } from '@chakra-ui/icons';
 import axios from 'axios';
@@ -45,24 +45,32 @@ const SearchBar = ({ from, onSearchResults }) => {
     }
   };
 
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   return (
-    <Box mb={4}>
+    <Box width="100%" maxWidth="500px">
       <InputGroup size="md">
         <Input
           pr="4.5rem"
-          placeholder="Search..."
+          type="text"
+          placeholder="Search chats..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
+          onKeyPress={handleKeyPress}
         />
         <InputRightElement width="4.5rem">
-          <Button
+          <IconButton
             h="1.75rem"
             size="sm"
-            onClick={handleSearch}
+            icon={<SearchIcon />}
             isLoading={isLoading}
-          >
-            <SearchIcon />
-          </Button>
+            onClick={handleSearch}
+            aria-label="Search"
+          />
         </InputRightElement>
       </InputGroup>
     </Box>
