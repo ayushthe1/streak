@@ -1,7 +1,35 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-import { ChakraProvider, Box } from '@chakra-ui/react';
+import {
+  Container,
+  Flex,
+  Textarea,
+  Box,
+  FormControl,
+  FormErrorMessage,
+  ModalFooter,
+  InputGroup,
+  InputRightElement,
+  Button,
+  Input,
+  Tabs,
+  TabList,
+  Tab,
+  TabPanels,
+  TabPanel,
+  VStack,
+  Text,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  ChakraProvider,
+} from '@chakra-ui/react';
+
+
 import theme from './theme';
 import { ColorModeSwitcher } from './ColorModeSwitcher';
 
@@ -17,22 +45,24 @@ import ActivityPage from './Components/Activitypage';
 function App() {
   return (
     <ChakraProvider theme={theme}>
-      <Box textAlign="right">
-        <ColorModeSwitcher justifySelf="flex-end" />
-      </Box>
-      <Box textAlign="center" fontSize="xl">
-        <BrowserRouter>
-          <Header></Header>
-          <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/chat" element={<Chat />} />
-            <Route path="/activity" element={<ActivityPage/>} />
-          </Routes>
-          <Footer></Footer>
-        </BrowserRouter>
-      </Box>
+      <Flex direction="column" minH="100vh">
+        {/* <Box textAlign="right">
+          <ColorModeSwitcher justifySelf="flex-end" />
+        </Box> */}
+        <Box textAlign="center" fontSize="xl" flex="1">
+          <BrowserRouter>
+            <Header />
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/chat" element={<Chat />} />
+              <Route path="/activity" element={<ActivityPage />} />
+            </Routes>
+          </BrowserRouter>
+        </Box>
+        <Footer />
+      </Flex>
     </ChakraProvider>
   );
 }
