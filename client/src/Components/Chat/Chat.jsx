@@ -297,160 +297,158 @@ class Chat extends Component {
               from={this.state.username}
               onSearchResults={this.handleSearchResults}
             />
-
-            <Tabs isFitted variant="enclosed" colorScheme="purple" mb={4}>
-              <TabList>
-                <Tab>Chat</Tab>
-                <Tab>Activities</Tab>
-              </TabList>
-              <TabPanels>
-                <TabPanel p={0}>
-                  {/* Existing chat interface */}
-                  <Flex
-                    flex={1}
-                    borderRadius="xl"
-                    overflow="hidden"
-                    boxShadow="xl"
-                  >
-                    <Flex
-                      flex={1}
-                      borderRadius="xl"
-                      overflow="hidden"
-                      boxShadow="xl"
-                    >
-                      <Box
-                        w={{ base: '100%', md: '300px' }}
-                        bg="gray.700"
-                        overflowY="auto"
-                        borderRightWidth={1}
-                        borderColor="gray.600"
-                        display={{
-                          base: this.state.to ? 'none' : 'block',
-                          md: 'block',
-                        }}
-                      >
-                        <Box p={4}>
-                          <FormControl isInvalid={this.state.isInvalid} mb={4}>
-                            <InputGroup size="md">
-                              <Input
-                                bg="gray.600"
-                                color="white"
-                                border="none"
-                                placeholder="Add Contact"
-                                name="contact"
-                                value={this.state.contact}
-                                onChange={this.onChange}
-                              />
-                              <InputRightElement width="4.5rem">
-                                <Button
-                                  h="1.75rem"
-                                  size="sm"
-                                  colorScheme="purple"
-                                  onClick={this.addContact}
-                                >
-                                  Add
-                                </Button>
-                              </InputRightElement>
-                            </InputGroup>
-                            {this.state.isContactInvalid && (
-                              <FormErrorMessage>
-                                Contact does not exist
-                              </FormErrorMessage>
-                            )}
-                          </FormControl>
-                          {this.state.renderContactList}
-                        </Box>
-                      </Box>
-
-                      <Flex
-                        direction="column"
-                        flex={1}
-                        bg="gray.800"
-                        display={{
-                          base: this.state.to ? 'flex' : 'none',
-                          md: 'flex',
-                        }}
-                      >
-                        <Box flex={1} overflowY="auto" p={4}>
-                          {this.state.chatHistory}
-                        </Box>
-
-                        <Box p={4} bg="gray.700">
-                          {this.state.to !== '' ? (
-                            <FormControl
-                              onKeyDown={this.onSubmit}
-                              onSubmit={this.onSubmit}
-                            >
-                              <Textarea
-                                bg="gray.600"
-                                color="white"
-                                border="none"
-                                borderRadius="md"
-                                placeholder="Type your message here... Press enter to send"
-                                _placeholder={{ color: 'gray.400' }}
-                                mb={2}
-                                name="message"
-                                value={this.state.message}
-                                onChange={this.onChange}
-                                rows={3}
-                              />
-                              <Flex
-                                justify="space-between"
-                                align="center"
-                                flexWrap="wrap"
-                              >
-                                <Input
-                                  type="file"
-                                  name="file"
-                                  onChange={this.onFileChange}
-                                  hidden
-                                  id="file-upload"
-                                />
-                                <Button
-                                  as="label"
-                                  htmlFor="file-upload"
-                                  colorScheme="purple"
-                                  size="sm"
-                                  mb={{ base: 2, sm: 0 }}
-                                >
-                                  Attach File
-                                </Button>
-                                {this.state.selectedFileName && (
-                                  <Text
-                                    fontSize="sm"
-                                    color="gray.400"
-                                    ml={2}
-                                    mb={{ base: 2, sm: 0 }}
-                                  >
-                                    {this.state.selectedFileName}
-                                  </Text>
-                                )}
-                                <Button
-                                  colorScheme="purple"
-                                  size="sm"
-                                  onClick={this.onSubmit}
-                                >
-                                  Send
-                                </Button>
-                              </Flex>
-                            </FormControl>
-                          ) : (
-                            <Text color="gray.400">
-                              Select a contact to start chatting
-                            </Text>
-                          )}
-                        </Box>
-                      </Flex>
-                    </Flex>
-                  </Flex>
-                </TabPanel>
-                <TabPanel>
-                  <ActivityPage activities={activities} />
-                </TabPanel>
-              </TabPanels>
-            </Tabs>
+            <Text color="purple.300" fontWeight="bold">
+              {this.state.username}
+            </Text>
           </Flex>
-
+  
+          <Tabs isFitted variant="enclosed" colorScheme="purple" flex={1}>
+            <TabList>
+              <Tab>Chat</Tab>
+              <Tab>Activities</Tab>
+            </TabList>
+            <TabPanels>
+              <TabPanel p={0}>
+                <Flex
+                  flex={1}
+                  borderRadius="xl"
+                  overflow="hidden"
+                  boxShadow="xl"
+                  h="calc(100vh - 150px)"
+                >
+                  <Box
+                    w={{ base: '100%', md: '300px' }}
+                    bg="gray.700"
+                    overflowY="auto"
+                    borderRightWidth={1}
+                    borderColor="gray.600"
+                    display={{
+                      base: this.state.to ? 'none' : 'block',
+                      md: 'block',
+                    }}
+                  >
+                    <Box p={4}>
+                      <FormControl isInvalid={this.state.isInvalid} mb={4}>
+                        <InputGroup size="md">
+                          <Input
+                            bg="gray.600"
+                            color="white"
+                            border="none"
+                            placeholder="Add Contact"
+                            name="contact"
+                            value={this.state.contact}
+                            onChange={this.onChange}
+                          />
+                          <InputRightElement width="4.5rem">
+                            <Button
+                              h="1.75rem"
+                              size="sm"
+                              colorScheme="purple"
+                              onClick={this.addContact}
+                            >
+                              Add
+                            </Button>
+                          </InputRightElement>
+                        </InputGroup>
+                        {this.state.isContactInvalid && (
+                          <FormErrorMessage>
+                            Contact does not exist
+                          </FormErrorMessage>
+                        )}
+                      </FormControl>
+                      {this.state.renderContactList}
+                    </Box>
+                  </Box>
+  
+                  <Flex
+                    direction="column"
+                    flex={1}
+                    bg="gray.800"
+                    display={{
+                      base: this.state.to ? 'flex' : 'none',
+                      md: 'flex',
+                    }}
+                  >
+                    <Box flex={1} overflowY="auto" p={4}>
+                      {this.state.chatHistory}
+                    </Box>
+  
+                    <Box p={4} bg="gray.700">
+                      {this.state.to !== '' ? (
+                        <FormControl
+                          onKeyDown={this.onSubmit}
+                          onSubmit={this.onSubmit}
+                        >
+                          <Textarea
+                            bg="gray.600"
+                            color="white"
+                            border="none"
+                            borderRadius="md"
+                            placeholder="Type your message here... Press enter to send"
+                            _placeholder={{ color: 'gray.400' }}
+                            mb={2}
+                            name="message"
+                            value={this.state.message}
+                            onChange={this.onChange}
+                            rows={3}
+                          />
+                          <Flex
+                            justify="space-between"
+                            align="center"
+                            flexWrap="wrap"
+                          >
+                            <Input
+                              type="file"
+                              name="file"
+                              onChange={this.onFileChange}
+                              hidden
+                              id="file-upload"
+                            />
+                            <Button
+                              as="label"
+                              htmlFor="file-upload"
+                              colorScheme="purple"
+                              size="sm"
+                              mb={{ base: 2, sm: 0 }}
+                            >
+                              Attach File
+                            </Button>
+                            {this.state.selectedFileName && (
+                              <Text
+                                fontSize="sm"
+                                color="gray.400"
+                                ml={2}
+                                mb={{ base: 2, sm: 0 }}
+                              >
+                                {this.state.selectedFileName}
+                              </Text>
+                            )}
+                            <Button
+                              colorScheme="purple"
+                              size="sm"
+                              onClick={this.onSubmit}
+                            >
+                              Send
+                            </Button>
+                          </Flex>
+                        </FormControl>
+                      ) : (
+                        <Flex justify="center" align="center" h="100%">
+                          <Text color="gray.400">
+                            Select a contact to start chatting
+                          </Text>
+                        </Flex>
+                      )}
+                    </Box>
+                  </Flex>
+                </Flex>
+              </TabPanel>
+              <TabPanel>
+                <ActivityPage activities={activities} />
+              </TabPanel>
+            </TabPanels>
+          </Tabs>
+  
           <Modal isOpen={isSearchModalOpen} onClose={this.closeSearchModal}>
             <ModalOverlay />
             <ModalContent>
@@ -492,12 +490,7 @@ class Chat extends Component {
               </ModalFooter>
             </ModalContent>
           </Modal>
-          <Text color="purple.300" fontWeight="bold">
-            {this.state.username}
-          </Text>
         </Flex>
-
-        {/* Modal code remains the same */}
       </Box>
     );
   }
