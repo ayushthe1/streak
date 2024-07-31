@@ -1,3 +1,5 @@
 .env
 node_modules/
 dialogflow_cred.json
+
+.aws/

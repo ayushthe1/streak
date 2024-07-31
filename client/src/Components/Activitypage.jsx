@@ -1,24 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Box, Text, VStack, Container } from '@chakra-ui/react';
 
-const ActivityPage = () => {
-  const [activities, setActivities] = useState([]);
-
-  // useEffect(() => {
-  //   const ws = new WebSocket('ws://localhost:3001/ws'); // Update the WebSocket URL accordingly
-
-  //   ws.onmessage = (event) => {
-  //     const message = JSON.parse(event.data);
-  //     if (message.type === 'activity') {
-  //       setActivities((prevActivities) => [message, ...prevActivities]);
-  //     }
-  //   };
-
-  //   return () => {
-  //     ws.close();
-  //   };
-  // }, []);
-
+const ActivityPage = ({ activities }) => {
   return (
     <Box p={4} bg="gray.900" minHeight="100vh">
       <Container maxW="container.lg">
@@ -52,7 +35,6 @@ const ActivityPage = () => {
       </Container>
     </Box>
   );
-  
 };
 
 export default ActivityPage;
