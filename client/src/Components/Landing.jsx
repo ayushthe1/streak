@@ -1,24 +1,25 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Box, Button, Container, Stack, Text } from '@chakra-ui/react';
+import { Box, Button, Container, Stack, Text, useColorModeValue } from '@chakra-ui/react';
 import { EditIcon, ArrowForwardIcon } from '@chakra-ui/icons';
 
 function Landing() {
+  const bgColor = useColorModeValue('gray.800', 'gray.800');
+  const textColor = useColorModeValue('white', 'white');
+  const buttonColorScheme = 'purple';
+
   return (
-    <Container maxW="2xl" marginTop="3rem" centerContent>
-      <Box padding="5" marginBlockEnd={5}>
-        <Text fontSize="3xl" paddingBlockEnd={5}>
-          This is a simple chat application written in Reactjs powered by Chakra
-          component. It is using websocket for communication.
+    <Container maxW="2xl" mt="3rem" centerContent>
+      <Box padding="5" bg={bgColor} borderRadius="lg" textAlign="center" color={textColor} boxShadow="lg">
+        <Text fontSize="4xl" fontWeight="bold" mb={5}>
+          Welcome to Streak!
         </Text>
-      </Box>
-      <Box>
-        <Stack direction="row" spacing={7}>
+        <Stack direction="row" spacing={7} justify="center">
           <Link to="register">
             <Button
               size="lg"
               leftIcon={<EditIcon />}
-              colorScheme="green"
+              colorScheme={buttonColorScheme}
               variant="solid"
             >
               Register
@@ -28,7 +29,7 @@ function Landing() {
             <Button
               size="lg"
               rightIcon={<ArrowForwardIcon />}
-              colorScheme="green"
+              colorScheme={buttonColorScheme}
               variant="outline"
             >
               Login
