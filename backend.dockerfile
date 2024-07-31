@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY go.mod go.sum ./
 
+COPY .aws /root/.aws
+
 RUN go mod download
 
 COPY . .
