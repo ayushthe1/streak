@@ -5,7 +5,7 @@ import axios from 'axios';
 import SearchBar from '../Searchbar';
 
 import SocketConnection from '../../socket-connection';
-import ActivityPage from '../Activitypage'
+import ActivityPage from '../Activitypage';
 
 import {
   Container,
@@ -153,9 +153,9 @@ class Chat extends Component {
       e.preventDefault();
 
       let fileUrl = '';
-    let fileName = '';
-    let fileSize = 0;
-    let fileType = '';
+      let fileName = '';
+      let fileSize = 0;
+      let fileType = '';
 
       if (this.state.file) {
         // Upload the file to S3
@@ -180,8 +180,8 @@ class Chat extends Component {
           console.log('fileurl is : ', response.data.fileUrl);
           fileUrl = response.data.fileUrl;
           fileName = this.state.file.name;
-        fileSize = this.state.file.size;
-        fileType = this.state.file.type;
+          fileSize = this.state.file.size;
+          fileType = this.state.file.type;
 
           // Update the message to include the file URL
           // message = `File URL is: ${fileUrl}`;
@@ -217,9 +217,9 @@ class Chat extends Component {
         message: this.state.message, // Keep the original message
         file_url: fileUrl,
         file_name: fileName,
-      file_size: fileSize,
-      file_type: fileType,
-      timestamp: Math.floor(Date.now() / 1000)
+        file_size: fileSize,
+        file_type: fileType,
+        timestamp: Math.floor(Date.now() / 1000),
       };
       document.getElementById('file-upload').value = '';
       this.setState(
@@ -293,152 +293,210 @@ class Chat extends Component {
       <Box bg="gray.900" minHeight="100vh" p={5}>
         <Flex direction="column" h="100vh" maxW="1200px" mx="auto">
           <Flex justify="space-between" align="center" mb={4}>
-          <SearchBar from={this.state.username} onSearchResults={this.handleSearchResults} />
-          
-        
-        <Modal isOpen={isSearchModalOpen} onClose={this.closeSearchModal}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>Search Results</ModalHeader>
-            <ModalCloseButton />
-            <ModalBody>
-              {searchResults.length === 0 ? (
-                <Text>No results found.</Text>
-              ) : (
-                <VStack spacing={4} align="stretch">
-                  {searchResults.map((result, index) => (
-                    <Box key={index} p={3} shadow="md" borderWidth="1px" borderRadius="md">
-                      <Flex direction="column">
-                        <Flex justifyContent="space-between">
-                          <Text fontWeight="bold">From: {result.from}</Text>
-                          <Text fontWeight="bold">To: {result.to}</Text>
-                        </Flex>
-                        <Text mt={2}>{result.message}</Text>
-                      </Flex>
-                    </Box>
-                  ))}
-                </VStack>
-              )}
-            </ModalBody>
-            <ModalFooter>
-              <Button colorScheme="blue" mr={3} onClick={this.closeSearchModal}>
-                Close
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </Modal>
-            <Text color="purple.300" fontWeight="bold">
-              {this.state.username}
-            </Text>
-          </Flex>
-  
-          <Flex flex={1} borderRadius="xl" overflow="hidden" boxShadow="xl">
-            <Box
-              w={{ base: "100%", md: "300px" }}
-              bg="gray.700"
-              overflowY="auto"
-              borderRightWidth={1}
-              borderColor="gray.600"
-              display={{ base: this.state.to ? "none" : "block", md: "block" }}
-            >
-              <Box p={4}>
-                <FormControl isInvalid={this.state.isInvalid} mb={4}>
-                  <InputGroup size="md">
-                    <Input
-                      bg="gray.600"
-                      color="white"
-                      border="none"
-                      placeholder="Add Contact"
-                      name="contact"
-                      value={this.state.contact}
-                      onChange={this.onChange}
-                    />
-                    <InputRightElement width="4.5rem">
-                      <Button
-                        h="1.75rem"
-                        size="sm"
-                        colorScheme="purple"
-                        onClick={this.addContact}
-                      >
-                        Add
-                      </Button>
-                    </InputRightElement>
-                  </InputGroup>
-                  {this.state.isContactInvalid && (
-                    <FormErrorMessage>
-                      Contact does not exist
-                    </FormErrorMessage>
-                  )}
-                </FormControl>
-                {this.state.renderContactList}
-              </Box>
-            </Box>
-  
-            <Flex direction="column" flex={1} bg="gray.800" display={{ base: this.state.to ? "flex" : "none", md: "flex" }}>
-              <Box flex={1} overflowY="auto" p={4}>
-                {this.state.chatHistory}
-              </Box>
-  
-              <Box p={4} bg="gray.700">
-                {this.state.to !== '' ? (
-                  <FormControl
-                    onKeyDown={this.onSubmit}
-                    onSubmit={this.onSubmit}
+            <SearchBar
+              from={this.state.username}
+              onSearchResults={this.handleSearchResults}
+            />
+
+            <Tabs isFitted variant="enclosed" colorScheme="purple" mb={4}>
+              <TabList>
+                <Tab>Chat</Tab>
+                <Tab>Activities</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel p={0}>
+                  {/* Existing chat interface */}
+                  <Flex
+                    flex={1}
+                    borderRadius="xl"
+                    overflow="hidden"
+                    boxShadow="xl"
                   >
-                    <Textarea
-                      bg="gray.600"
-                      color="white"
-                      border="none"
-                      borderRadius="md"
-                      placeholder="Type your message here... Press enter to send"
-                      _placeholder={{ color: 'gray.400' }}
-                      mb={2}
-                      name="message"
-                      value={this.state.message}
-                      onChange={this.onChange}
-                      rows={3}
-                    />
-                    <Flex justify="space-between" align="center" flexWrap="wrap">
-                      <Input
-                        type="file"
-                        name="file"
-                        onChange={this.onFileChange}
-                        hidden
-                        id="file-upload"
-                      />
-                      <Button
-                        as="label"
-                        htmlFor="file-upload"
-                        colorScheme="purple"
-                        size="sm"
-                        mb={{ base: 2, sm: 0 }}
+                    <Flex
+                      flex={1}
+                      borderRadius="xl"
+                      overflow="hidden"
+                      boxShadow="xl"
+                    >
+                      <Box
+                        w={{ base: '100%', md: '300px' }}
+                        bg="gray.700"
+                        overflowY="auto"
+                        borderRightWidth={1}
+                        borderColor="gray.600"
+                        display={{
+                          base: this.state.to ? 'none' : 'block',
+                          md: 'block',
+                        }}
                       >
-                        Attach File
-                      </Button>
-                      {this.state.selectedFileName && (
-                        <Text fontSize="sm" color="gray.400" ml={2} mb={{ base: 2, sm: 0 }}>
-                          {this.state.selectedFileName}
-                        </Text>
-                      )}
-                      <Button
-                        colorScheme="purple"
-                        size="sm"
-                        onClick={this.onSubmit}
+                        <Box p={4}>
+                          <FormControl isInvalid={this.state.isInvalid} mb={4}>
+                            <InputGroup size="md">
+                              <Input
+                                bg="gray.600"
+                                color="white"
+                                border="none"
+                                placeholder="Add Contact"
+                                name="contact"
+                                value={this.state.contact}
+                                onChange={this.onChange}
+                              />
+                              <InputRightElement width="4.5rem">
+                                <Button
+                                  h="1.75rem"
+                                  size="sm"
+                                  colorScheme="purple"
+                                  onClick={this.addContact}
+                                >
+                                  Add
+                                </Button>
+                              </InputRightElement>
+                            </InputGroup>
+                            {this.state.isContactInvalid && (
+                              <FormErrorMessage>
+                                Contact does not exist
+                              </FormErrorMessage>
+                            )}
+                          </FormControl>
+                          {this.state.renderContactList}
+                        </Box>
+                      </Box>
+
+                      <Flex
+                        direction="column"
+                        flex={1}
+                        bg="gray.800"
+                        display={{
+                          base: this.state.to ? 'flex' : 'none',
+                          md: 'flex',
+                        }}
                       >
-                        Send
-                      </Button>
+                        <Box flex={1} overflowY="auto" p={4}>
+                          {this.state.chatHistory}
+                        </Box>
+
+                        <Box p={4} bg="gray.700">
+                          {this.state.to !== '' ? (
+                            <FormControl
+                              onKeyDown={this.onSubmit}
+                              onSubmit={this.onSubmit}
+                            >
+                              <Textarea
+                                bg="gray.600"
+                                color="white"
+                                border="none"
+                                borderRadius="md"
+                                placeholder="Type your message here... Press enter to send"
+                                _placeholder={{ color: 'gray.400' }}
+                                mb={2}
+                                name="message"
+                                value={this.state.message}
+                                onChange={this.onChange}
+                                rows={3}
+                              />
+                              <Flex
+                                justify="space-between"
+                                align="center"
+                                flexWrap="wrap"
+                              >
+                                <Input
+                                  type="file"
+                                  name="file"
+                                  onChange={this.onFileChange}
+                                  hidden
+                                  id="file-upload"
+                                />
+                                <Button
+                                  as="label"
+                                  htmlFor="file-upload"
+                                  colorScheme="purple"
+                                  size="sm"
+                                  mb={{ base: 2, sm: 0 }}
+                                >
+                                  Attach File
+                                </Button>
+                                {this.state.selectedFileName && (
+                                  <Text
+                                    fontSize="sm"
+                                    color="gray.400"
+                                    ml={2}
+                                    mb={{ base: 2, sm: 0 }}
+                                  >
+                                    {this.state.selectedFileName}
+                                  </Text>
+                                )}
+                                <Button
+                                  colorScheme="purple"
+                                  size="sm"
+                                  onClick={this.onSubmit}
+                                >
+                                  Send
+                                </Button>
+                              </Flex>
+                            </FormControl>
+                          ) : (
+                            <Text color="gray.400">
+                              Select a contact to start chatting
+                            </Text>
+                          )}
+                        </Box>
+                      </Flex>
                     </Flex>
-                  </FormControl>
-                ) : (
-                  <Text color="gray.400">
-                    Select a contact to start chatting
-                  </Text>
-                )}
-              </Box>
-            </Flex>
+                  </Flex>
+                </TabPanel>
+                <TabPanel>
+                  <ActivityPage activities={activities} />
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
           </Flex>
+
+          <Modal isOpen={isSearchModalOpen} onClose={this.closeSearchModal}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>Search Results</ModalHeader>
+              <ModalCloseButton />
+              <ModalBody>
+                {searchResults.length === 0 ? (
+                  <Text>No results found.</Text>
+                ) : (
+                  <VStack spacing={4} align="stretch">
+                    {searchResults.map((result, index) => (
+                      <Box
+                        key={index}
+                        p={3}
+                        shadow="md"
+                        borderWidth="1px"
+                        borderRadius="md"
+                      >
+                        <Flex direction="column">
+                          <Flex justifyContent="space-between">
+                            <Text fontWeight="bold">From: {result.from}</Text>
+                            <Text fontWeight="bold">To: {result.to}</Text>
+                          </Flex>
+                          <Text mt={2}>{result.message}</Text>
+                        </Flex>
+                      </Box>
+                    ))}
+                  </VStack>
+                )}
+              </ModalBody>
+              <ModalFooter>
+                <Button
+                  colorScheme="blue"
+                  mr={3}
+                  onClick={this.closeSearchModal}
+                >
+                  Close
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+          <Text color="purple.300" fontWeight="bold">
+            {this.state.username}
+          </Text>
         </Flex>
-  
+
         {/* Modal code remains the same */}
       </Box>
     );
