@@ -1,31 +1,12 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 
 import {
   Container,
   Flex,
   Textarea,
   Box,
-  FormControl,
-  FormErrorMessage,
-  ModalFooter,
-  InputGroup,
-  InputRightElement,
-  Button,
-  Input,
-  Tabs,
-  TabList,
-  Tab,
-  TabPanels,
-  TabPanel,
-  VStack,
-  Text,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalCloseButton,
+
   ChakraProvider,
 } from '@chakra-ui/react';
 
@@ -42,22 +23,58 @@ import Footer from './Components/Footer';
 import ActivityPage from './Components/Activitypage';
 
 // theme.styles.global['font-family'] = 'roboto';
+function MainLayout({ children }) {
+  return (
+    <>
+      {/* <Header /> */}
+      {children}
+    </>
+  );
+}
+
 function App() {
   return (
     <ChakraProvider theme={theme}>
       <Flex direction="column" minH="100vh">
-        {/* <Box textAlign="right">
-          <ColorModeSwitcher justifySelf="flex-end" />
-        </Box> */}
+        <Box textAlign="right">
+          {/* <ColorModeSwitcher justifySelf="flex-end" /> */}
+        </Box>
         <Box textAlign="center" fontSize="xl" flex="1">
           <BrowserRouter>
-            <Header />
             <Routes>
               <Route path="/" element={<Landing />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/chat" element={<Chat />} />
-              <Route path="/activity" element={<ActivityPage />} />
+              <Route
+                path="/register"
+                element={
+                  <MainLayout>
+                    <Register />
+                  </MainLayout>
+                }
+              />
+              <Route
+                path="/login"
+                element={
+                  <MainLayout>
+                    <Login />
+                  </MainLayout>
+                }
+              />
+              <Route
+                path="/chat"
+                element={
+                  <MainLayout>
+                    <Chat />
+                  </MainLayout>
+                }
+              />
+              <Route
+                path="/activity"
+                element={
+                  <MainLayout>
+                    <ActivityPage />
+                  </MainLayout>
+                }
+              />
             </Routes>
           </BrowserRouter>
         </Box>
