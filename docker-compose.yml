@@ -41,6 +41,9 @@ services:
       - POSTGRES_PASSWORD=mysecretpassword
     ports:
       - 5432:5432
+    volumes:
+      - ${HOME}/data/pgdata:/var/lib/postgresql/data 
+        
 
   redis-db:
     image:  redis
@@ -51,6 +54,8 @@ services:
   weaviate:
     image: cr.weaviate.io/semitechnologies/weaviate:1.24.20
     restart: on-failure:0
+    volumes:
+      - ${HOME}/data/weaviate:/var/lib/weaviate
     ports:
      - 8080:8080
      - 50051:50051
@@ -127,8 +132,8 @@ services:
       - 5672:5672   # for sender and consumer connections
       - 15672:15672 # for serve RabbitMQ GUI
     volumes:
-      - ${HOME}/dev-rabbitmq/data/:/var/lib/rabbitmq
-      - ${HOME}/dev-rabbitmq/log/:/var/log/rabbitmq
+      - ${HOME}/data/rabbitmq/data/:/var/lib/rabbitmq
+      - ${HOME}/data/rabbitmq/log/:/var/log/rabbitmq
     restart: always
 
   frontend:
