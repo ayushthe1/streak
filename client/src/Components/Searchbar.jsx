@@ -29,7 +29,7 @@ const SearchBar = ({ from, onSearchResults }) => {
 
     setIsLoading(true);
     try {
-      const response = await axios.post('http://localhost:3000/api/wv', { query, from });
+      const response = await axios.post('http://localhost:3000/api/wv', { query, from }, { withCredentials: true });
       onSearchResults(response.data);
     } catch (error) {
       console.error('Error fetching results:', error);
