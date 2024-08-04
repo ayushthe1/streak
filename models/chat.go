@@ -16,17 +16,3 @@ type ContactList struct {
 	Username     string `json:"username"`
 	LastActivity int64  `json:"last_activity"`
 }
-
-// {
-//     "type" : "chat",
-//     "chat" : {
-//         "from":"ayush",
-//         "to":"arav",
-//         "message":"Hi arav"
-//     }
-// }
-
-// {
-//     "type" : "bootup",
-//     "user" : "arav"
-// }
