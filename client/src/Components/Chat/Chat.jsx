@@ -373,7 +373,7 @@ class Chat extends Component {
                     </Box>
   
                     <Box p={4} bg="gray.700">
-                      {this.state.to !== '' && this.state.to !== 'ChatBot' ? (
+                      {this.state.to !== '' ? (
                         <FormControl
                           onKeyDown={this.onSubmit}
                           onSubmit={this.onSubmit}
