@@ -31,53 +31,47 @@ function Landing() {
   const accentColor = 'purple.400';
 
   return (
-    <Box bg={bgColor} color={textColor}>
-      {/* Hero Section */}
-      <Box 
-        backgroundImage="url('https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-1.2.1&auto=format&fit=crop&w=2850&q=80')"
-        backgroundPosition="center"
-        backgroundRepeat="no-repeat"
-        backgroundSize="cover"
-      >
-        <Box bg="rgba(47, 51, 73, 0.85)" py={20}>
-          <Container maxW="container.xl">
-            <Grid templateColumns={{ base: "1fr", lg: "1fr 1fr" }} gap={10} alignItems="center">
-              <VStack spacing={8} align="flex-start">
-                <Heading as="h1" size="3xl" lineHeight="shorter">
-                  Welcome to <Text as="span" color={accentColor}>Streak</Text>
-                </Heading>
-                <Text fontSize="xl">
-                  Experience the future of communication with our AI-powered chat platform. 
-                  Connect, share, and discover with unprecedented ease and intelligence.
-                </Text>
-                <Stack direction={{ base: "column", sm: "row" }} spacing={4}>
-                  <Button 
-                    as={Link} 
-                    to="/register" 
-                    size="lg" 
-                    colorScheme="purple" 
-                    rightIcon={<ArrowForwardIcon />}
-                  >
-                    Register
-                  </Button>
-                  <Button 
-                    as={Link} 
-                    to="/login" 
-                    size="lg" 
-                    variant="outline" 
-                    colorScheme="purple"
-                  >
-                    Login
-                  </Button>
-                </Stack>
-              </VStack>
-              <Box display={{ base: 'none', lg: 'block' }}>
-                <Image src="/chat.png" alt="Streak App" borderRadius="lg" />
-              </Box>
-            </Grid>
-          </Container>
-        </Box>
-      </Box>
+    <Box>
+    <Box 
+  backgroundImage="url('https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-1.2.1&auto=format&fit=crop&w=2850&q=80')"
+  backgroundPosition="center"
+  backgroundRepeat="no-repeat"
+  backgroundSize="cover"
+>
+  <Box bg="rgba(47, 51, 73, 0.85)" py={20} minHeight="80vh" display="flex" alignItems="center">
+    <Container maxW="container.xl">
+      <VStack spacing={8} align="center" textAlign="center">
+        <Heading as="h1" size="3xl" lineHeight="shorter">
+          Welcome to <Text as="span" color={accentColor}>Streak</Text>
+        </Heading>
+        <Text fontSize="xl" maxW="2xl">
+          Experience the future of communication with our AI-powered chat platform. 
+          Connect, share, and discover with unprecedented ease and intelligence.
+        </Text>
+        <Stack direction={{ base: "column", sm: "row" }} spacing={4} pt={4}>
+          <Button 
+            as={Link} 
+            to="/register" 
+            size="lg" 
+            colorScheme="purple" 
+            rightIcon={<ArrowForwardIcon />}
+          >
+            Register
+          </Button>
+          <Button 
+            as={Link} 
+            to="/login" 
+            size="lg" 
+            variant="outline" 
+            colorScheme="purple"
+          >
+            Login
+          </Button>
+        </Stack>
+      </VStack>
+    </Container>
+  </Box>
+  </Box>
 
       {/* Features Section */}
       <Box py={20}>
