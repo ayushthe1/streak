@@ -26,9 +26,9 @@ const ContactList = (contacts, sendMessage, selectedContact) => {
           <Text fontSize="lg" fontWeight="bold" color={isSelected ? "white" : "purple.300"}>
             {c.username}
           </Text>
-          <Text as="sub" fontSize="xs" color={isSelected ? "gray.200" : "gray.400"}>
+          {/* <Text as="sub" fontSize="xs" color={isSelected ? "gray.200" : "gray.400"}>
             Last active: {ts.toDateString()}
-          </Text>
+          </Text> */}
         </Box>
         <Divider borderColor="gray.600" />
       </Box>

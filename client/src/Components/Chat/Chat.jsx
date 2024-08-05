@@ -327,8 +327,8 @@ class Chat extends Component {
                     }}
                   >
                     <Box p={4}>
-                      <FormControl isInvalid={this.state.isInvalid} mb={4}>
-                        <InputGroup size="md">
+                      {/* <FormControl isInvalid={this.state.isInvalid} mb={4}> */}
+                        {/* <InputGroup size="md">
                           <Input
                             bg="gray.600"
                             color="white"
@@ -337,8 +337,8 @@ class Chat extends Component {
                             name="contact"
                             value={this.state.contact}
                             onChange={this.onChange}
-                          />
-                          <InputRightElement width="4.5rem">
+                          /> */}
+                          {/* <InputRightElement width="4.5rem">
                             <Button
                               h="1.75rem"
                               size="sm"
@@ -347,14 +347,14 @@ class Chat extends Component {
                             >
                               Add
                             </Button>
-                          </InputRightElement>
-                        </InputGroup>
-                        {this.state.isContactInvalid && (
+                          </InputRightElement> */}
+                        {/* </InputGroup> */}
+                        {/* {this.state.isContactInvalid && (
                           <FormErrorMessage>
                             Contact does not exist
                           </FormErrorMessage>
-                        )}
-                      </FormControl>
+                        )} */}
+                      {/* </FormControl> */}
                       {this.state.renderContactList}
                     </Box>
                   </Box>

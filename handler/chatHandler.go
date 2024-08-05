@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/ayushthe1/streak/database"
 	"github.com/ayushthe1/streak/models"
@@ -72,6 +73,28 @@ func ChatHistoryHandler(c *fiber.Ctx) error {
 		return c.JSON(fiber.Map{
 			"message": fmt.Errorf("error : %v", err.Error()),
 		})
+	}
+
+	if u2 == "ChatBot" {
+
+		chatBotIntroText := `Hello! I'm Streak's AI assistant, ready to enhance your chat experience. Here's how I can help you:
+
+- Get real-time weather updates for any city
+- Answer general knowledge questions on a wide range of topics
+- Provide quick explanations and definitions
+- Offer suggestions and recommendations
+
+I'm constantly learning and evolving. Stay tuned for exciting new capabilities coming soon!
+
+How can I assist you today?`
+
+		msg := models.Chat{
+			From:      u2,
+			To:        u1,
+			Msg:       chatBotIntroText,
+			Timestamp: time.Now().Unix(),
+		}
+		allChats = append(allChats, msg)
 	}
 
 	c.Status(http.StatusOK)

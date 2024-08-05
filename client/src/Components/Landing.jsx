@@ -10,7 +10,7 @@ import { ArrowForwardIcon } from '@chakra-ui/icons';
 const Feature = ({ title, text, icon }) => {
   return (
     <VStack 
-      align="start" 
+      align="center" 
       spacing={4} 
       bg="whiteAlpha.100" 
       p={6} 
@@ -19,8 +19,8 @@ const Feature = ({ title, text, icon }) => {
       _hover={{ transform: 'translateY(-5px)', boxShadow: 'lg' }}
     >
       <Icon as={icon} w={10} h={10} color="purple.400" />
-      <Text fontWeight="bold" fontSize="xl">{title}</Text>
-      <Text>{text}</Text>
+      <Text fontWeight="bold" fontSize="xl" textAlign="center">{title}</Text>
+      <Text textAlign="center">{text}</Text>
     </VStack>
   );
 };
@@ -58,7 +58,7 @@ function Landing() {
                     colorScheme="purple" 
                     rightIcon={<ArrowForwardIcon />}
                   >
-                    Get Started
+                    Register
                   </Button>
                   <Button 
                     as={Link} 
@@ -72,7 +72,7 @@ function Landing() {
                 </Stack>
               </VStack>
               <Box display={{ base: 'none', lg: 'block' }}>
-                <Image src="https://via.placeholder.com/500x400" alt="Streak App" borderRadius="lg" />
+                <Image src="/chat.png" alt="Streak App" borderRadius="lg" />
               </Box>
             </Grid>
           </Container>
