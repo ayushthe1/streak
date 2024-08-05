@@ -8,6 +8,9 @@ Try it out here : https://streak.ayushsharma.co.in/
 
 ![Project Architecture](https://github.com/user-attachments/assets/9c6bf006-80c9-4919-8623-73bfd5f7dab1)
 
+## Chat Interface
+![Chat interface](https://github.com/user-attachments/assets/dc481370-b226-45fe-96ac-19695eb9ac4d)
+
 
 ## Features
 
