@@ -28,12 +28,12 @@ Try it out here : https://streak.ayushsharma.co.in/
 
 - **Backend**: Golang, Fiber framework
 - **Frontend**: React, Chakra UI
-- **Database**: PostgreSQL
-- **Message Queue**: RabbitMQ, Redis
+- **Database**: PostgreSQL, Redis (will add caching later)
+- **Message Queue**: RabbitMQ
 - **Message Persistence**: Kafka
-- **Search**: Weaviate
-- **File Storage**: AWS S3
-- **AI Chatbot**: Dialogflow, Gemini
+- **Semantic Search**: Weaviate
+- **File Storage**: AWS S3 (using their Go SDK)
+- **AI Chatbot**: Dialogflow ((using their Go SDK), Gemini
 - **Containerization**: Docker Compose
 - **Deployment**: Google Cloud Platform (GCP)
 - **Monitoring**: Prometheus, Grafana
