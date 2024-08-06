@@ -15,6 +15,7 @@ import {
   InputGroup,
   InputRightElement,
   Icon,
+  useToast,
 } from '@chakra-ui/react';
 import { EditIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { FaUserPlus } from 'react-icons/fa';
@@ -33,14 +34,33 @@ class Register extends Component {
       redirectTo: '/chat?u=',
       showPassword: false,
     };
+    this.toast = props.toast;
   }
 
   onChange = event => {
-    this.setState({ [event.target.name]: event.target.value });
+    const { name, value } = event.target;
+    if (name === 'username') {
+      if (/[^a-zA-Z0-9]/.test(value)) {
+        this.toast({
+          title: 'Invalid Character',
+          description: 'Username cannot contain special characters.',
+          status: 'warning',
+          duration: 3000,
+          isClosable: true,
+        });
+        return;
+      }
+    }
+    this.setState({ [name]: value });
   };
 
   onSubmit = async e => {
     e.preventDefault();
+
+    if (/[^a-zA-Z0-9]/.test(this.state.username)) {
+      this.setState({ message: 'Username cannot contain special characters', isInvalid: true });
+      return;
+    }
 
     try {
       const res = await axios.post(this.state.endpoint, {
@@ -86,7 +106,7 @@ class Register extends Component {
                     <FormLabel color="gray.300">Username</FormLabel>
                     <Input
                       type="text"
-                      placeholder="Enter your username (no special char)"
+                      placeholder="Enter your username (letters and numbers only)"
                       name="username"
                       value={this.state.username}
                       onChange={this.onChange}
@@ -145,4 +165,7 @@ class Register extends Component {
   }
 }
 
-export default Register;
+export default function RegisterWithToast() {
+  const toast = useToast();
+  return <Register toast={toast} />;
+}
