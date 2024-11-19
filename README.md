@@ -1,7 +1,7 @@
 # Streak
 
 This is scalable chat website built using Golang, designed to provide real-time messaging, file sharing, semantic search, and AI chatbot functionalities. The application is containerized using Docker Compose and deployed on Google Cloud Platform (GCP). 
-Try it out here : https://streak.ayushsharma.co.in/
+Try it out here (not live now due to cloud cost) : https://streak.ayushsharma.co.in/ 
 
 
 ## Architecture
