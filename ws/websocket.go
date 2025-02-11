@@ -479,7 +479,7 @@ func StartWebSocketServer() {
 	app := fiber.New()
 
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:     "http://localhost:4000 ,https://streak.ayushsharma.co.in",
+		AllowOrigins:     "http://localhost:4000 ,https://streakk.ayushsharma.co.in",
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
 		AllowCredentials: true,
 	}))

@@ -29,7 +29,7 @@ const SearchBar = ({ from, onSearchResults }) => {
 
     setIsLoading(true);
     try {
-      const response = await axios.post('https://api.ayushsharma.co.in/api/wv', { query, from }, { withCredentials: true });
+      const response = await axios.post('https://apii.ayushsharma.co.in/api/wv', { query, from }, { withCredentials: true });
       onSearchResults(response.data);
     } catch (error) {
       console.error('Error fetching results:', error);

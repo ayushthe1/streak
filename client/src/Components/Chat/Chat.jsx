@@ -46,7 +46,7 @@ class Chat extends Component {
       message: '',
       to: '',
       isInvalid: false,
-      endpoint: 'https://api.ayushsharma.co.in/api',
+      endpoint: 'https://apii.ayushsharma.co.in/api',
       contact: '',
       contacts: [],
       renderContactList: [],
@@ -252,7 +252,7 @@ class Chat extends Component {
 
   fetchChatHistory = async (u1 = 'user1', u2 = 'user2') => {
     const res = await axios.get(
-      `https://api.ayushsharma.co.in/api/chat-history?u1=${u1}&u2=${u2}`, { withCredentials: true }
+      `https://apii.ayushsharma.co.in/api/chat-history?u1=${u1}&u2=${u2}`, { withCredentials: true }
     );
 
     console.log(res.data);

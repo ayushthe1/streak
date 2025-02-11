@@ -1,6 +1,6 @@
 class SocketConnection {
   constructor() {
-    this.socket = new WebSocket(`wss://ws.ayushsharma.co.in`);
+    this.socket = new WebSocket(`wss://wss.ayushsharma.co.in`);
   }
 
   connect = cb => {

@@ -29,7 +29,7 @@ class Register extends Component {
       password: '',
       message: '',
       isInvalid: false,
-      endpoint: 'https://api.ayushsharma.co.in/api/register',
+      endpoint: 'https://apii.ayushsharma.co.in/api/register',
       redirect: false,
       redirectTo: '/chat?u=',
       showPassword: false,
